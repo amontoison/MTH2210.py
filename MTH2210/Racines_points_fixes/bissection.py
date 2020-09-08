@@ -46,6 +46,8 @@ def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
         raise ValueError("f(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x0))+")")
     if not(check_type_arguments.check_generic(f(x1), np.float64)[0]):
         raise ValueError("f(x1) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x1))+")")
+    if not(f(x0)*f(x1) < 0):
+        raise ValueError("Condition initiale f(x0)*f(x1) < 0 non respectée")
     if nb_iter < 0:
         raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
     if tol_rel < 0:
@@ -60,35 +62,31 @@ def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
 ###########################################
 
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
-def format_iter(k, list_x, list_f, list_d):
-    if k == 1:
-        iter_infos  = "  k ||     x_k     |   f(x_k)    |   df(x_k)\n"
-        iter_infos += "-----------------------------------------------\n"
-        iter_infos += "{:>3} || {:^+5.4e} | {:^+5.4e} | {:^11}".format("0", list_x[0], list_f[0], "-")
-        iter_infos += "\n"
+def format_iter(k, x_g, x_d, x_c, f_g, f_d, f_c):
+    if k == 0:
+        iter_infos  = "   k ||     x_g     |     x_d     ||     f_g     |     f_d     ||     x_c     |     f_c\n"
+        iter_infos += "-------------------------------------------------------------------------------------------\n"
     else:
         iter_infos = ""
-    iter_infos += "{:>3} || {:^+5.4e} | {:^+5.4e} | {:^+5.4e}".format(k, list_x[-1], list_f[-1], list_d[-1])
+    iter_infos += "{:>4} || {:^+.4e} | {:^+.4e} || {:^+.4e} | {:^+.4e} || {:^+.4e} | {:^+.4e}".format(k, x_g, x_d, f_g, f_d, x_c, f_c)
     return(iter_infos)
 
 
 
-#%%#####################################
-# Fonctions de test du critère d'arrêt #
-########################################
+#%%########################################
+# Fonctions de tests des critères d'arrêt #
+###########################################
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
-def stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs):
+def stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel):
     if k > nb_iter:
         return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
     if abs(list_f[-1]) < tol_abs:
-        return(True, "Racine localisée à {:2.1e} près : x_k = {:+8.7e} et f(x_k) = {:5.4e}".format(tol_abs, list_x[-1], list_f[-1]))
-    if list_d[-1] == 0:
-        return(True, "Dérivée exactement nulle au point courant x_k = {:5.4e}".format(tol_rel, list_x[-1]))
-    if k > 1:
-        err_rel = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
-        if err_rel < tol_rel:
-            return(True, "Convergence de la méthode achevée à {:2.1e} près : df/dx(x_k) = {:5.4e}".format(tol_rel, err_rel))
+        return(True, "Racine localisée à {:2.1e} près : x = {:+8.7e} et f(x) = {:+8.7e}".format(tol_abs, list_x[-1], list_f[-1]))
+    if k >= 1:
+        err_rel_x = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
+        if err_rel_x < tol_rel:
+            return(True, "Convergence achevée à {:2.1e} près : x = {:+8.7e} et erreur relative sur x = {:5.4e}".format(tol_rel, list_x[-1], err_rel_x))
     return(False, "convergence inachevée")
 
 
@@ -99,28 +97,33 @@ def stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs):
 
 # Phase d'initialisation de toutes les suites exploitées par la méthode
 def init_algo(f, x0, x1):
-    k = 1
-    x_km1 = x0
-    x_k = x1
-    f_km1 = f(x_km1)
-    f_k = f(x_k)
-    d_k = (f_k-f_km1)/(x_k-x_km1)
-    list_x = [x_km1, x_k]
-    list_f = [f_km1, f_k]
-    list_d = [d_k]
-    return(k, list_x, list_f, list_d)
+    k = 0
+    x_g = min(x0, x1)
+    x_d = max(x0, x1)
+    x_c = (x_g+x_d)/2
+    f_g = f(x_g)
+    f_d = f(x_d)
+    f_c = f(x_c)
+    list_x = [x_c]
+    list_f = [f_c]
+    return(k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f)
 
 # Exécute une itération de la méthode
-def iter_algo(f, k, list_x, list_f, list_d):
-    x_km1, x_k = list_x[-2:]
-    f_km1, f_k = list_f[-2:]
-    d_k = (f_k-f_km1)/(x_k-x_km1)
+def iter_algo(f, k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f):
     k += 1
-    x_k -= f_k/d_k
-    list_x.append(x_k)
-    list_f.append(f(x_k))
-    list_d.append(d_k)
-    return(k, list_x, list_f, list_d)
+    if f_g*f_c < 0:
+        x_d = x_c
+        x_c = (x_g+x_d)/2
+        f_d = f_c
+        f_c = f(x_c)
+    elif f_c*f_d < 0:
+        x_g = x_c
+        x_c = (x_g+x_d)/2
+        f_g = f_c
+        f_c = f(x_c)
+    list_x.append(x_c)
+    list_f.append(f_c)
+    return(k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f)
 
 
 
@@ -128,15 +131,18 @@ def iter_algo(f, k, list_x, list_f, list_d):
 # Définition de la fonction principale #
 ########################################
 
-def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
-    """Méthode de recherche d'une racine de la fonction f via la méthode de Newton :
-        x_0 et x_1 donnés,\n
-        d_k = (f(x_k)-f(x_km1)) / (x_k-x_km1),\n
-        x_kp1 = x_k - f(x_k) / d_k.
+def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
+    """Méthode de recherche d'une racine de la fonction f via la méthode de la bissection :
+        x_g et x_d donnés, vérifiant f(x_g)*f(x_d) < 0\n
+        et x_c = (x_g+x_d)/2 et f(x_c),\n
+        si f(x_c) = 0, on a trouvé la racine,\n
+        si f(x_g)*f(x_c) < 0, alors la méthode est relancée avec x_g inchangé et x_d = x_c,\n
+        si f(x_c)*f(x_d) < 0, alors la méthode est relancée avec x_g = x_c et x_d inchangé,\n
+        à chaque itération k, le point noté x_k est x_c.
     
     Les arguments attendus sont :
         une fonction f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),\n 
-        deux scalaires x0 et x1 (de type int, float ou np.float64), points de départ de la méthode itérative.
+        deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
     
     Les arguments optionnels sont :
         un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,\n
@@ -148,18 +154,19 @@ def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
             nul part (aucune information écrite ni sauvegardée) si output = "None".
 
     La méthode vérifie les conditions suivantes :
-         f est définie en x0 et x1, et renvoie un scalaire,\n
-        df est définie en x0 et x1, et renvoie un scalaire,\n
+        les bornes initiales doivent satisfaire f(x0)*f(x1) < 0 pour garantir l'existence d'une racine dans [x0,x1],\n
+        f est définie en x0 et x1, et renvoie en chacun de ces points un scalaire,\n
+        nb_iter, tol_rel et tol_abs sont positifs,\n
         tous les paramètres reçus ont bien le type attendu.
     
     Les sorties de la méthode sont :
-        list_x, la liste des points x_k,\n
-        list_f, les valeurs par f des éléments de list_x,\n
-        list_d, la liste des approximations d_k des dérivées de f en les x_k.
+        list_x, la liste des points centraux de l'intervalle de recherche à chaque itération (donc les approximations x_k de la racine),\n
+        list_f, les valeurs par f des éléments de list_x.
         
     Exemples d'appel :
-        secante(lambda x : np.sin(x), 1, 0.5),\n
-        secante(lambda x :x**2, 2, 1).
+        bissection(lambda x : np.sin(x), -0.5, 1/3),\n
+        bissection(lambda x : 10**20*np.sin(x), -0.5, 0.25),\n
+        bissection(f, x0, x1, output="dossier_test/Résultats.txt") où f est définie via def, x0 et x1 sont deux réels.
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations
@@ -167,16 +174,16 @@ def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
     
     # Initialisation de l'algorithme
-    k, list_x, list_f, list_d = init_algo(f, x0, x1)
-    write_iter(k, list_x, list_f, list_d)
+    k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = init_algo(f, x0, x1)
+    write_iter(k, x_g, x_d, x_c, f_g, f_d, f_c)
     
     # Déroulement de l'algorithme
-    while not(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[0]):
-        k, list_x, list_f, list_d = iter_algo(f, k, list_x, list_f, list_d)
-        write_iter(k, list_x, list_f, list_d)
+    while not(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[0]):
+        k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = iter_algo(f, k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f)
+        write_iter(k, x_g, x_d, x_c, f_g, f_d, f_c)
     
-    write_stopping(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[1])
+    write_stopping(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
-    return(list_x, list_f, list_d)
+    return(list_x, list_f)
 
 

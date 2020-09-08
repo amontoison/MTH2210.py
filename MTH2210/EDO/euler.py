@@ -65,15 +65,15 @@ def check_parameters_consistency(f, x0, t0, tm, m, output):
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, t_k):
     if type(x_k) == np.float64:
-        temp1 = 12
-        temp2 = 13
+        temp1 = 11
+        temp2 = 12
     else:
         n = len(x_k)
         temp1 = 2+11*n+2*(n-1)+1
         temp2 = temp1
     if k == 0:
         iter_infos  = "   k ||    t_k   | " + ("{:^"+str(temp1)+"}").format("x_k") + "\n"
-        iter_infos += "-------------------" + "-"*temp2 + "\n"
+        iter_infos += "------------------" + "-"*temp2 + "\n"
     else:
         iter_infos = ""
     iter_infos += "{:>4} || {:>8.4f} | ".format(k, t_k)
@@ -82,6 +82,7 @@ def format_iter(k, x_k, t_k):
     else:
         iter_infos += "["+", ".join(["{:>+5.4e}".format(xi) for xi in x_k])+"]"
     return(iter_infos)
+
 
 
 #%%########################################
@@ -113,11 +114,7 @@ def init_algo(x0, t0, tm, m):
 # Exécute une itération de la méthode
 def iter_algo(f, k, x, t, h, list_x, list_t):
     k += 1
-    y1 = f(x       , t)
-    y2 = f(x+y1*h/2, t+h/2)
-    y3 = f(x+y2*h/2, t+h/2)
-    y4 = f(x+y3*h  , t+h)
-    x  = x + (y1 + 2*y2 + 2*y3 + y4) * h/6
+    x = x + h*f(x,t)
     t += h
     list_x.append(x)
     list_t.append(t)
@@ -129,28 +126,23 @@ def iter_algo(f, k, x, t, h, list_x, list_t):
 # Définition de la fonction principale #
 ########################################
 
-def rk4(f, x0, t0, tm, m, output=""):
-    """Méthode de résolution numérique d'une équation (dx/dt)(t) = f(x(t),t) par le schéma de Runge-Kutta d'ordre 4 :
+def euler(f, x0, t0, tm, m, output=""):
+    """Méthode de résolution numérique d'une équation (dx/dt)(t) = f(x(t),t) par le schéma d'Euler :
         x_0 donné, t_0 donné, pas de temps h donné,\n
-        y_k^1 = f(x_k          , t_k),\n
-        y_k^2 = f(x_k+y_k^1*h/2, t_k+h/2),\n
-        y_k^2 = f(x_k+y_k^2*h/2, t_k+h/2),\n
-        y_k^4 = f(x_k+y_k^3*h  , t_k+h),\n
-        x_kp1 = x_k + (y_k^1+2y_k^2+3y_k^3+y_k^4)*h/6,\n
+        x_kp1 = x_k + h*f(x_k,t_k),\n
         t_kp1 = t_k + h.
     
     Les arguments attendus sont :
         une fonction f, admettant en entrée un vecteur x et un réel t, renvoyant un vecteur f(x,t),\n 
-        un vecteur x0, condition initiale de l'équation,\n
-        deux réels t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,\n
-        un entier m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
+        un vecteur  x0, condition initiale de l'équation,\n
+        deux réels  t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,\n
+        un entier    m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
     
-    L'argument optionnel est :
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+    L'argument optionnel est une chaîne de caractères output qui renvoie les affichages de la fonction vers :
             la sortie standard si output = "",\n
             un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
             nul part (aucune information écrite ni sauvegardée) si output = "None".
-    
+
     La méthode vérifie les conditions suivantes :
         la fonction f est définie en (x0,t0) et en (x0,tm),\n
         f(x0,t0) renvoie un vecteur de la même dimension et même type que x0,\n
@@ -177,13 +169,13 @@ def rk4(f, x0, t0, tm, m, output=""):
         list_t, la liste des instants t_k.
         
     Exemples d'appel :
-        rk4(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),\n
-        rk4(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),\n
+        euler(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),\n
+        euler(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),\n
         def f(x,t):
             x0,x1 = 1,1
-            return(np.array([x[0]*(x[1]-x1),x[1]*(x0-x[0])]))
+            return(np.array([x[0]*(x[1]-1),x[1]*(1-x[0])]))
         x = np.array([2,1])
-        list_x, list_t = rk4(f, x, 0, 10, 100).
+        list_x, list_t = euler(f, x, 0, 10, 100)
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations
@@ -206,3 +198,4 @@ def rk4(f, x0, t0, tm, m, output=""):
     return(list_x, list_t)
 
 
+euler(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100)

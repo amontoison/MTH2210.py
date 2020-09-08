@@ -54,12 +54,12 @@ def check_parameters_consistency(x, y, x_e, output):
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_output(x, y, x_e, y_e):
     output_infos  = " {:^11} || {:^11}".format("x", "y")+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     for i in range(len(x)):
         output_infos += " {:>+8.4e} || {:>+8.4e}".format(x[i], y[i])+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     output_infos += " {:^11} || {:^11}".format("x_e", "y_e")+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     for i in range(len(x_e)):
         output_infos += " {:>+8.4e} || {:>+8.4e}".format(x_e[i], y_e[i])+"\n"
     return(output_infos)

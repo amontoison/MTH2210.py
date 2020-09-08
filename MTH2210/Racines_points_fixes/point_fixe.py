@@ -67,12 +67,10 @@ def format_iter(k, x_k, f_k):
     if type(x_k) == np.float64:
         temp1 = 13
         temp2 = 11
-        temp3 = 14
     else:
         n = len(x_k)
         temp1 = 13
         temp2 = 11*n + 2*(n-1) + 2
-        temp3 = temp2 + 3
     if k == 0:
         iter_infos  = "   k || "
         iter_infos += ("{:^"+str(temp1)+"}").format("norm(f_k-x_k)")
@@ -81,7 +79,7 @@ def format_iter(k, x_k, f_k):
         iter_infos += " | "
         iter_infos += ("{:^"+str(temp2)+"}").format("f_k")
         iter_infos += "\n"
-        iter_infos += "-------" + "-"*(temp1+4) + "-"*temp3 + "-"*temp3
+        iter_infos += "--------" + "-"*temp1 + "----" + "-"*temp2 + "---" + "-"*temp2
         iter_infos += "\n"
     else:
         iter_infos = ""

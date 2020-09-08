@@ -66,12 +66,12 @@ def check_parameters_consistency(x, y, x_e, cond_g, val_g, cond_d, val_d, output
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_output(x, y, x_e, y_e):
     output_infos  = " {:^11} || {:^11}".format("x", "y")+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     for i in range(len(x)):
         output_infos += " {:>+8.4e} || {:>+8.4e}".format(x[i], y[i])+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     output_infos += " {:^11} || {:^11}".format("x_e", "y_e")+"\n"
-    output_infos += "-"*28 + "\n"
+    output_infos += " "+"-"*26 + "\n"
     for i in range(len(x_e)):
         output_infos += " {:>+8.4e} || {:>+8.4e}".format(x_e[i], y_e[i])+"\n"
     return(output_infos)
@@ -162,7 +162,7 @@ def init_algo(x, y, c_g, v_g, c_d, v_d):
 # Définition de la fonction principale #
 ########################################
 
-def spline3(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
+def spline_cub(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
     """Calcul d'une spline cubique d'interpolation de tous les points (x_k,y_k) donnés en paramètres x et y.
     
     Les arguments attendus sont :
@@ -177,7 +177,7 @@ def spline3(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
             cond_g = 2 impose à la courbure d'être constante à gauche\n.
             cond_g = 3 impose à la pente à gauche de valoir val_g.
         un réel val_g, utilisé dans la détermination de la condition à gauche (ignorée si cond_g = 0 ou 2) (défaut = 0),\n
-        un entier cond_g dans [0,1,2,3], déterminant la condition à droite (analogue à cond_g),\n
+        un entier cond_d dans [0,1,2,3], déterminant la condition à droite (analogue à cond_g),\n
         un réel val_d, utilisé dans la détermination de la condition à droite (analogue à val_g),\n
         une chaîne de caractères output qui renvoie les affichages de la fonction vers :
             la sortie standard si output = "",\n
@@ -197,9 +197,9 @@ def spline3(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
         interpolation, une fonction renvoyant les valeurs de la spline en chacun des éléments du vecteur d'abscisses qu'on lui passe en paramètre.
         
     Exemples d'appel :
-        spline3([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),\n
-        spline3(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),\n
-        y_e, spl = spline3([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis spl(np.array([3,4,5]))
+        spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),\n
+        spline_cub(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),\n
+        y_e, spl = spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis spl(np.array([3,4,5]))
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations
