@@ -74,16 +74,16 @@ from MTH2210.spline3    import spline3
 # import MTH2210
 # import numpy as np
 
-print("############################")
-print("# Méthode de la bissection #")
-print("############################")
-print()
-print("x, f = MTH2210.bissection(lambda x : np.sin(x), -0.5, 1/3) :\n")
-x, f = MTH2210.bissection(lambda x : np.sin(x), -0.5, 1/3)
-print("Les sorties sont :")
-print("x =", x)
-print("f =", f)
-print()
+# print("############################")
+# print("# Méthode de la bissection #")
+# print("############################")
+# print()
+# print("x, f = MTH2210.bissection(lambda x : np.sin(x), -0.5, 1/3) :\n")
+# x, f = MTH2210.bissection(lambda x : np.sin(x), -0.5, 1/3)
+# print("Les sorties sont :")
+# print("x =", x)
+# print("f =", f)
+# print()
 
 # print("\n\n")
 
