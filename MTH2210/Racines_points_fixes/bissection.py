@@ -187,4 +187,3 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
     return(list_x, list_f)
 
 
-bissection(lambda x : np.sin(x), -0.5, 1/3)
