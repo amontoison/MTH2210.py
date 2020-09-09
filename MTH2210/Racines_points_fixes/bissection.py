@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function, check_relative_tolerance
+from MTH2210.Module_coeur import check_type_arguments, writing_function, check_relative_tolerance
 import types
 import numpy as np
 
@@ -187,3 +187,4 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
     return(list_x, list_f)
 
 
+bissection(lambda x : np.sin(x), -0.5, 1/3)
