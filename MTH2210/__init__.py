@@ -1,3 +1,7 @@
+from MTH2210.Module_coeur.check_relative_tolerance import check_relative_tolerance
+from MTH2210.Module_coeur.check_type_arguments     import check_type_arguments
+from MTH2210.Module_coeur.writing_function         import writing_function
+
 from MTH2210.Racines_points_fixes.bissection import bissection
 from MTH2210.Racines_points_fixes.newton_1d  import newton_1d
 from MTH2210.Racines_points_fixes.newton_nd  import newton_nd
