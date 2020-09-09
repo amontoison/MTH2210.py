@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import numpy as np
 
 
@@ -166,40 +166,40 @@ def spline_cub(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
     """Calcul d'une spline cubique d'interpolation de tous les points (x_k,y_k) donnés en paramètres x et y.
     
     Les arguments attendus sont :
-        un vecteur x, contenant les abscisses des points d'interpolation,\n
-        un vecteur y, contenant les ordonnées des points d'interpolation,\n
-        un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
+        - un vecteur x, contenant les abscisses des points d'interpolation,\n
+        - un vecteur y, contenant les ordonnées des points d'interpolation,\n
+        - un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
     
     Les arguments optionnels sont :
-        un entier cond_g dans [0,1,2,3], déterminant la condition à gauche (défaut = 0) :
-            cond_g = 0 impose la condition naturelle à gauche,\n
-            cond_g = 1 impose à la courbure à gauche de valoir val_g,\n
-            cond_g = 2 impose à la courbure d'être constante à gauche\n.
-            cond_g = 3 impose à la pente à gauche de valoir val_g.
-        un réel val_g, utilisé dans la détermination de la condition à gauche (ignorée si cond_g = 0 ou 2) (défaut = 0),\n
-        un entier cond_d dans [0,1,2,3], déterminant la condition à droite (analogue à cond_g),\n
-        un réel val_d, utilisé dans la détermination de la condition à droite (analogue à val_g),\n
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - un entier cond_g dans [0,1,2,3], déterminant la condition à gauche (défaut = 0) :
+            - cond_g = 0 impose la condition naturelle à gauche,
+            - cond_g = 1 impose à la courbure à gauche de valoir val_g,
+            - cond_g = 2 impose à la courbure d'être constante à gauche,
+            - cond_g = 3 impose à la pente à gauche de valoir val_g,
+        - un réel val_g, utilisé dans la détermination de la condition à gauche (ignorée si cond_g = 0 ou 2) (défaut = 0),
+        - un entier cond_d dans [0,1,2,3], déterminant la condition à droite (analogue à cond_g),
+        - un réel val_d, utilisé dans la détermination de la condition à droite (analogue à val_g),
+        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "",
+            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nul part (aucune information écrite ni sauvegardée) si output = "None".
 
     La méthode vérifie les conditions suivantes :
-        x et y ont même dimension,\n
-        x, y et x_e contiennent des réels,\n
-        x ne contient pas deux fois la même abscisse,\n
-        les valeurs de x sont dans l'ordre croissant,\n
-        cond_g et cond_d sont tous les deux dans [0,1,2,3],\n
-        tous les paramètres reçus ont bien le type attendu.
+        - x et y ont même dimension,
+        - x, y et x_e contiennent des réels,
+        - x ne contient pas deux fois la même abscisse,
+        - les valeurs de x sont dans l'ordre croissant,
+        - cond_g et cond_d sont tous les deux dans [0,1,2,3],
+        - tous les paramètres reçus ont bien le type attendu.
     
     Les sorties de la méthode sont :
-        y_e, la liste des valeurs du polynôme aux abscisses x_e,\n
-        interpolation, une fonction renvoyant les valeurs de la spline en chacun des éléments du vecteur d'abscisses qu'on lui passe en paramètre.
+        - y_e, la liste des valeurs du polynôme aux abscisses x_e,
+        - interpolation, une fonction renvoyant les valeurs de la spline en chacun des éléments du vecteur d'abscisses qu'on lui passe en paramètre.
         
     Exemples d'appel :
-        spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),\n
-        spline_cub(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),\n
-        y_e, spl = spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis spl(np.array([3,4,5]))
+        - spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),
+        - spline_cub(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),
+        - y_e, spl = spline_cub([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis spl(np.array([3,4,5])).
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations

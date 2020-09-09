@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import types
 import numpy as np
 
@@ -131,58 +131,58 @@ def iter_algo(f, k, x, t, h, list_x, list_t):
 
 def rk4(f, x0, t0, tm, m, output=""):
     """Méthode de résolution numérique d'une équation (dx/dt)(t) = f(x(t),t) par le schéma de Runge-Kutta d'ordre 4 :
-        x_0 donné, t_0 donné, pas de temps h donné,\n
-        y_k^1 = f(x_k          , t_k    ),\n
-        y_k^2 = f(x_k+y_k^1*h/2, t_k+h/2),\n
-        y_k^2 = f(x_k+y_k^2*h/2, t_k+h/2),\n
-        y_k^4 = f(x_k+y_k^3*h  , t_k+h  ),\n
-        x_kp1 = x_k + (y_k^1+2y_k^2+3y_k^3+y_k^4)*h/6,\n
-        t_kp1 = t_k + h.
+        - x_0 donné, t_0 donné, pas de temps h donné,
+        - y_k^1 = f(x_k          , t_k    ),
+        - y_k^2 = f(x_k+y_k^1*h/2, t_k+h/2),
+        - y_k^2 = f(x_k+y_k^2*h/2, t_k+h/2),
+        - y_k^4 = f(x_k+y_k^3*h  , t_k+h  ),
+        - x_kp1 = x_k + (y_k^1+2y_k^2+3y_k^3+y_k^4)*h/6,
+        - t_kp1 = t_k + h.
     
     Les arguments attendus sont :
-        une fonction f, admettant en entrée un vecteur x et un réel t, renvoyant un vecteur f(x,t),\n 
-        un vecteur x0, condition initiale de l'équation,\n
-        deux réels t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,\n
-        un entier m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
+        - une fonction f, admettant en entrée un vecteur x et un réel t, renvoyant un vecteur f(x,t),
+        - un vecteur x0, condition initiale de l'équation,
+        - deux réels t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,
+        - un entier m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
     
     L'argument optionnel est une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - la sortie standard si output = "",
+        - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+        - nul part (aucune information écrite ni sauvegardée) si output = "None".
     
     La méthode vérifie les conditions suivantes :
-        la fonction f est définie en (x0,t0) et en (x0,tm),\n
-        f(x0,t0) renvoie un vecteur de la même dimension et même type que x0,\n
-        tous les paramètres reçus ont bien le type attendu.
+        - la fonction f est définie en (x0,t0) et en (x0,tm),
+        - f(x0,t0) renvoie un vecteur de la même dimension et même type que x0,
+        - tous les paramètres reçus ont bien le type attendu.
     
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple :
-        x = np.array(0) est un np.ndarray, x = np.array([0]) également,\n
-        f(x,t) = np.cos(np.array(0))   est un np.float64,\n
-        f(x,t) = np.cos(np.array([0])) est un np.ndarray,\n
-        f(x,t) = np.cos(t)             est un np.float64.
+        - x = np.array(0) est un np.ndarray, x = np.array([0]) également,
+        - f(x,t) = np.cos(np.array(0))   est un np.float64,
+        - f(x,t) = np.cos(np.array([0])) est un np.ndarray,
+        - f(x,t) = np.cos(t)             est un np.float64.
     Ces différences de types peuvent faire échouer la méthode si x est de dimension 1. La méthode est conçue pour fonctionner suivant :
-        si la dimension de x est > 1 :\n
-            x      défini par un np.array([coordonnées]),\n
-            f(x,t) renvoyant  un np.ndarray de même dimension que x,\n
-        si x est de dimension 1 :\n
-            x      défini par un np.float64(valeur), un float ou un int,\n
-            f(x,t) renvoyant  un np.float64,\n
-        cas sans garantie de fonctionnement correct :
-            x      complexe,\n
-            x      de dimension 1 défini par un np.array([valeur]).
+        - si la dimension de x est > 1 :
+            - x      défini par un np.array([coordonnées]),
+            - f(x,t) renvoyant  un np.ndarray de même dimension que x,
+        - si x est de dimension 1 :
+            - x      défini par un np.float64(valeur), un float ou un int,
+            - f(x,t) renvoyant  un np.float64,
+        - cas sans garantie de fonctionnement correct :
+            - x      complexe,
+            - x      de dimension 1 défini par un np.array([valeur]).
     
     Les sorties de la méthode sont :
-        list_x, la liste des points x(t_k),\n
-        list_t, la liste des instants t_k.
+        - list_x, la liste des points x(t_k),
+        - list_t, la liste des instants t_k.
         
     Exemples d'appel :
-        rk4(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),\n
-        rk4(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),\n
-        def f(x,t):
-            x0,x1 = 1,1
-            return(np.array([x[0]*(x[1]-x1),x[1]*(x0-x[0])]))
-        x = np.array([2,1])
-        list_x, list_t = rk4(f, x, 0, 10, 100).
+        - rk4(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),
+        - rk4(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),
+        - def f(x,t):
+              x0,x1 = 1,1
+              return(np.array([x[0]*(x[1]-x1),x[1]*(x0-x[0])]))
+          x = np.array([2,1])
+          list_x, list_t = rk4(f, x, 0, 10, 100).
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations

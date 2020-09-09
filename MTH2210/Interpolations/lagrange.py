@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import numpy as np
 
 
@@ -92,33 +92,33 @@ def init_algo(x, y):
 
 def lagrange(x, y, x_e, output=""):
     """Calcul du polynôme d'interpolation de Lagrange passant par tous les points (x_k,y_k) donnés en paramètres x et y :
-        pour tout z, Lagrange(x,y)(z) = somme(j)(  y_j * prod(i)((x_i-z)/(x_i-x_j))  ).
+        - pour tout z, Lagrange(x,y)(z) = somme(j)(  y_j * prod(i)((x_i-z)/(x_i-x_j))  ).
     
     Les arguments attendus sont :
-        un vecteur   x, contenant les abscisses des points d'interpolation,\n
-        un vecteur   y, contenant les ordonnées des points d'interpolation,\n
-        un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
+        - un vecteur   x, contenant les abscisses des points d'interpolation,
+        - un vecteur   y, contenant les ordonnées des points d'interpolation,
+        - un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
     
     L'argument optionnel est :
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "",
+            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nul part (aucune information écrite ni sauvegardée) si output = "None".
 
     La méthode vérifie les conditions suivantes :
-        x et y ont même dimension,\n
-        x, y et x_e contiennent des réels,\n
-        x ne contient pas deux fois la même abscisse,\n
-        tous les paramètres reçus ont bien le type attendu.
+        - x et y ont même dimension,
+        - x, y et x_e contiennent des réels,
+        - x ne contient pas deux fois la même abscisse,
+        - tous les paramètres reçus ont bien le type attendu.
     
     Les sorties de la méthode sont :
-        y_e, la liste des valeurs du polynôme aux abscisses x_e,\n
-        interpolation, une fonction renvoyant les valeurs du polynôme en chacun des éléments du vecteur d'abscisses qu'on lui passe en paramètre.
+        - y_e, la liste des valeurs du polynôme aux abscisses x_e,
+        - interpolation, une fonction renvoyant les valeurs du polynôme en chacun des éléments du vecteur d'abscisses qu'on lui passe en paramètre.
         
     Exemples d'appel :
-        lagrange([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),\n
-        lagrange(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),\n
-        y_e, lag = lagrange([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis lag(np.array([3,4,5])).
+        - lagrange([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]),
+        - lagrange(np.array([-1,0,1]), np.array([0,-1,0]), np.array([-2,-1,-0.5,0,0.5,1,2])),
+        - y_e, lag = lagrange([-1,0,1], [0,-1,0], [-2,-1,-0.5,0,0.5,1,2]), puis lag(np.array([3,4,5])).
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations

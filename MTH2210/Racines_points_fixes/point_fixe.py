@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function, check_relative_tolerance
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import types
 import numpy as np
 
@@ -142,49 +142,49 @@ def iter_algo(f, k, x, list_x):
 
 def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de calcul d'un point fixe x=f(x) par méthode itérative :
-        x_0 donné,\n
-        x_kp1 = f(x_k).
+        - x_0 donné,
+        - x_kp1 = f(x_k).
     
     Les arguments attendus sont :
-        une fonction f, admettant en entrée un vecteur x, renvoyant un vecteur f(x) de même dimension que x,\n 
-        un vecteur x0, point de départ de la méthode itérative.
+        - une fonction f, admettant en entrée un vecteur x, renvoyant un vecteur f(x) de même dimension que x,
+        - un vecteur x0, point de départ de la méthode itérative.
     
     Les arguments optionnels sont :
-        un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,\n
-        un réel tol_rel définissant la condition d'arrêt e_k = norm(x_k-x_km1) / (norm(x_k)+eps) <= tol_rel\n
-        un réel tol_abs définissant la condition d'arrêt norm(f(x_k)-x_k) <= tol_abs,\n
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,
+        - un réel tol_rel définissant la condition d'arrêt e_k = norm(x_k-x_km1) / (norm(x_k)+eps) <= tol_rel,
+        - un réel tol_abs définissant la condition d'arrêt norm(f(x_k)-x_k) <= tol_abs,
+        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "",
+            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nul part (aucune information écrite ni sauvegardée) si output = "None".
     
     La méthode vérifie les conditions suivantes :
-        la fonction f est définie en x0,\n
-        norm(f(x0)-x0) >= norm(f(f(x0)-f(x0))),n
-        f(x0) renvoie un vecteur de la même dimension que x0.
+        - la fonction f est définie en x0,
+        - norm(f(x0)-x0) >= norm(f(f(x0)-f(x0)))
+        - f(x0) renvoie un vecteur de la même dimension que x0.
     
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple, en définissant :
-        x = np.array(1) est un np.ndarray, x = np.array([1]) également,\n
-        f(x) = np.cos(x)           est un np.float64,\n
-        f(x) = np.array(np.cos(x)) est un np.ndarray,\n
-        f(x) = np.cos(t)           est un np.float64.
+        - x = np.array(1) est un np.ndarray, x = np.array([1]) également,
+        - f(x) = np.cos(x)           est un np.float64,
+        - f(x) = np.array(np.cos(x)) est un np.ndarray,
+        - f(x) = np.cos(t)           est un np.float64.
     Ces différences de types peuvent faire échouer la méthode si x est de dimension 1. La méthode est conçue pour fonctionner suivant :
-        si la dimension de x est > 1 :\n
-            x    défini par un np.array([coordonnées]),\n
-            f(x) renvoyant  un np.ndarray de même dimension que x,\n
-        si x est de dimension 1 :\n
-            x    défini par un np.float64(valeur), un float ou un int,\n
-            f(x) renvoyant  un np.float64,\n
-        cas sans garantie de fonctionnement correct :
-            x      complexe,\n
-            x      de dimension 1 défini par un np.array([valeur]).
+        - si la dimension de x est > 1 :
+            - x    défini par un np.array([coordonnées]),
+            - f(x) renvoyant  un np.ndarray de même dimension que x,
+        - si x est de dimension 1 :
+            - x    défini par un np.float64(valeur), un float ou un int,
+            - f(x) renvoyant  un np.float64,
+        - cas sans garantie de fonctionnement correct :
+            - x      complexe,
+            - x      de dimension 1 défini par un np.array([valeur]).
     
     La sortie de la méthode est :
-        list_x, la liste des points x_k.
+        - list_x, la liste des points x_k.
         
     Exemples d'appel :
-        point_fixe(lambda x : x**2, 0.5),\n
-        point_fixe(lambda x : x**2, np.array([0.1,0.1])).
+        - point_fixe(lambda x : x**2, 0.5),
+        - point_fixe(lambda x : x**2, np.array([0.1,0.1])).
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations

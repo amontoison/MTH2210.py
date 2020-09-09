@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210 import check_type_arguments, writing_function, check_relative_tolerance
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import types
 import numpy as np
 
@@ -150,37 +150,37 @@ def iter_algo(f, k, list_x, list_f, list_d):
 
 def newton_nd(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de recherche d'une racine de la fonction vectorielle f via la méthode de Newton avec approximation de la jacobienne :
-        x_0 donné,\n
-        x_kp1 = xk - Jac(f)(x_k)^-1*f(x_k).
+        - x_0 donné,
+        - x_kp1 = xk - Jac(f)(x_k)^-1*f(x_k).
     
     Les arguments attendus sont :
-        une fonction  f, admettant en entrée un vecteur x et renvoyant un vecteur f(x),\n
-        un scalaire  x0 (de type int, float ou np.float64), point de départ de la méthode itérative.
+        - une fonction  f, admettant en entrée un vecteur x et renvoyant un vecteur f(x),
+        - un scalaire  x0 (de type int, float ou np.float64), point de départ de la méthode itérative.
     
     Les arguments optionnels sont :
-        un entier nb_iter définissant le nombre maximal d'itérations allouées à la méthode,\n
-        un réel   tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel\n
-        un réel   tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,\n
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - un entier nb_iter définissant le nombre maximal d'itérations allouées à la méthode,
+        - un réel   tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
+        - un réel   tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
+        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "",
+            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nul part (aucune information écrite ni sauvegardée) si output = "None".
 
     La méthode vérifie les conditions suivantes :
-         f est définie en x0, et renvoie un vecteur de même dimension que x0,\n
-        tous les paramètres reçus ont bien le type attendu.
+         - f est définie en x0, et renvoie un vecteur de même dimension que x0,
+         - tous les paramètres reçus ont bien le type attendu.
     
     Les sorties de la méthode sont :
-        list_x, la liste des points x_k,\n
-        list_f, les valeurs par     f  des éléments de list_x,\n
-        list_d, les valeurs par Jac(f) des éléments de list_x.
+        - list_x, la liste des points x_k,
+        - list_f, les valeurs par     f  des éléments de list_x,
+        - list_d, les valeurs par Jac(f) des éléments de list_x.
         
     Exemples d'appel :
-        newton_nd(lambda x:x**2, np.array([1,1,1])),\n
-        def f(x):
-            return(np.array([x[0]**2, x[1]/2, np.sin(x[2])]))
-        x0 = np.array([1,1,1])
-        newton_nd(f, x0).
+        - newton_nd(lambda x:x**2, np.array([1,1,1])),
+        - def f(x):
+              return(np.array([x[0]**2, x[1]/2, np.sin(x[2])]))
+          x0 = np.array([1,1,1])
+          newton_nd(f, x0).
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations

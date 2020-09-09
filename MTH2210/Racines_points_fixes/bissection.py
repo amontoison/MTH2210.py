@@ -12,7 +12,7 @@ Created on Wed Jul 01 12:00:00 2020
 # Import des bibliothèques requises #
 #####################################
 
-from MTH2210.Module_coeur import check_type_arguments, writing_function, check_relative_tolerance
+from ..Module_coeur import check_type_arguments, check_relative_tolerance, writing_function
 import types
 import numpy as np
 
@@ -133,40 +133,39 @@ def iter_algo(f, k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f):
 
 def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de recherche d'une racine de la fonction f via la méthode de la bissection :
-        x_g et x_d donnés, vérifiant f(x_g)*f(x_d) < 0\n
-        et x_c = (x_g+x_d)/2 et f(x_c),\n
-        si f(x_c) = 0, on a trouvé la racine,\n
-        si f(x_g)*f(x_c) < 0, alors la méthode est relancée avec x_g inchangé et x_d = x_c,\n
-        si f(x_c)*f(x_d) < 0, alors la méthode est relancée avec x_g = x_c et x_d inchangé,\n
-        à chaque itération k, le point noté x_k est x_c.
+        - x_g et x_d donnés, vérifiant f(x_g)*f(x_d) < 0, et x_c = (x_g+x_d)/2 et f(x_c),
+        - si f(x_c) = 0, on a trouvé la racine,
+        - si f(x_g)*f(x_c) < 0, alors la méthode est relancée avec x_g inchangé et x_d = x_c,
+        - si f(x_c)*f(x_d) < 0, alors la méthode est relancée avec x_g = x_c et x_d inchangé,
+        - à chaque itération k, le point noté x_k est x_c.
     
     Les arguments attendus sont :
-        une fonction f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),\n 
-        deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
+        - une fonction f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
+        - deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
     
     Les arguments optionnels sont :
-        un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,\n
-        un réel tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel\n
-        un réel tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,\n
-        une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            la sortie standard si output = "",\n
-            un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),\n
-            nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,
+        - un réel tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
+        - un réel tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
+        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "",
+            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nul part (aucune information écrite ni sauvegardée) si output = "None".
 
     La méthode vérifie les conditions suivantes :
-        les bornes initiales doivent satisfaire f(x0)*f(x1) < 0 pour garantir l'existence d'une racine dans [x0,x1],\n
-        f est définie en x0 et x1, et renvoie en chacun de ces points un scalaire,\n
-        nb_iter, tol_rel et tol_abs sont positifs,\n
-        tous les paramètres reçus ont bien le type attendu.
+        - les bornes initiales doivent satisfaire f(x0)*f(x1) < 0 pour garantir l'existence d'une racine dans [x0,x1],
+        - f est définie en x0 et x1, et renvoie en chacun de ces points un scalaire,
+        - nb_iter, tol_rel et tol_abs sont positifs,
+        - tous les paramètres reçus ont bien le type attendu.
     
     Les sorties de la méthode sont :
-        list_x, la liste des points centraux de l'intervalle de recherche à chaque itération (donc les approximations x_k de la racine),\n
-        list_f, les valeurs par f des éléments de list_x.
+        - list_x, la liste des points centraux de l'intervalle de recherche à chaque itération (donc les approximations x_k de la racine),
+        - list_f, les valeurs par f des éléments de list_x.
         
     Exemples d'appel :
-        bissection(lambda x : np.sin(x), -0.5, 1/3),\n
-        bissection(lambda x : 10**20*np.sin(x), -0.5, 0.25),\n
-        bissection(f, x0, x1, output="dossier_test/Résultats.txt") où f est définie via def, x0 et x1 sont deux réels.
+        - bissection(lambda x : np.sin(x), -0.5, 1/3),
+        - bissection(lambda x : 10**20*np.sin(x), -0.5, 0.25),
+        - bissection(f, x0, x1, output="dossier_test/Résultats.txt") où f est définie via def, x0 et x1 sont deux réels.
     """
     
     # Test des paramètres et définition de la destination de sortie des itérations
