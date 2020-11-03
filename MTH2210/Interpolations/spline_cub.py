@@ -50,7 +50,7 @@ def check_parameters_consistency(x, y, x_e, cond_g, val_g, cond_d, val_d, output
         raise ValueError("Le vecteur x des abscisses contient des doublons")
     x_sort = [xi for xi in x]
     x_sort.sort()
-    if x != x_sort:
+    if True in (x != x_sort):
         raise ValueError("Le vecteur x des abscisses n'est pas dans l'ordre croissant")
     if cond_g not in [0,1,2,3]:
         raise ValueError("La condition limite à gauche n'a pas une valeur recevable (= "+str(cond_g)+"), attendue dans [0,1,2,3]")
