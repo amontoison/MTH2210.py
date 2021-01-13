@@ -8,3 +8,7 @@ Codes Python pour le cours MTH2210 de Polytechnique Montréal.
 pip install --upgrade git+https://github.com/amontoison/MTH2210.py.git
 import MTH2210
 ```
+
+## Syntaxe
+
+[MATLAB–Python–Julia cheatsheet](https://cheatsheets.quantecon.org/)
