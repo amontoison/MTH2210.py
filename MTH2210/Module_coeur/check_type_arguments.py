@@ -53,13 +53,15 @@ def check_function(arg):
 def check_str(arg):
     return(check_fundamental(arg, str))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int, float ou np.float64); et (type est le type de arg)
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int, float, np.int ou np.float64); et (type est le type de arg)
 def check_real(arg):
     if check_fundamental(arg, np.int)[0] == True:
         return(True, get_type(arg))
     elif check_fundamental(arg, np.float64)[0] == True:
         return(True, get_type(arg))
     elif check_fundamental(arg, float)[0] == True:
+        return(True, get_type(arg))
+    elif check_fundamental(arg, int)[0] == True:
         return(True, get_type(arg))
     else:
         return(False, get_type(arg))

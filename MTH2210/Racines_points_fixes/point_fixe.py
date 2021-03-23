@@ -176,11 +176,12 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
             - x    défini par un np.float64(valeur), un float ou un int,
             - f(x) renvoyant  un np.float64,
         - cas sans garantie de fonctionnement correct :
-            - x      complexe,
-            - x      de dimension 1 défini par un np.array([valeur]).
+            - x    complexe,
+            - x    de dimension 1 défini par un np.array([valeur]).
     
-    La sortie de la méthode est :
-        - list_x, la liste des points x_k.
+    Les sorties de la méthode sont :
+        - list_x,  la liste des points x_k,
+        - err_rel, la liste des approximations de l'erreur relative à chaque itération (prenant pour référence le dernier élément de list_x).
         
     Exemples d'appel :
         - point_fixe(lambda x : x**2, 0.5),
@@ -201,9 +202,10 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     while not(stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs)[0]):
         k, x, fx, list_x = iter_algo(f, k, x, list_x)
         write_iter(k, x, fx)
+    err_rel = np.array( [abs(xi-list_x[-1]) for xi in list_x] )
     
     write_stopping(stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
-    return(list_x)
+    return(list_x, err_rel)
 
 

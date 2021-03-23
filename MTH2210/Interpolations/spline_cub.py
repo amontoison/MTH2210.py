@@ -28,9 +28,9 @@ def check_parameters_consistency(x, y, x_e, cond_g, val_g, cond_d, val_d, output
                     [y,       "y",       [list, np.ndarray]],
                     [x_e,     "x_e",     [list, np.ndarray]],
                     [cond_g,  "cond_g",   int],
-                    [val_g,   "val_g",    int],
+                    [val_g,   "val_g",    np.float64],
                     [cond_d,  "cond_d",   int],
-                    [val_d,   "val_d",    int],
+                    [val_d,   "val_d",    np.float64],
                     [output,  "output",   str]]
     if check_type_arguments.check_list(x)[0] == True:
         for i in range(len(x)):
