@@ -137,7 +137,7 @@ def iter_algo(f, jac, k, list_x, list_f, list_d):
 # Définition de la fonction principale #
 ########################################
 
-def newton_nd(f, jac, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
+def newton_nd_avec_der(f, jac, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de recherche d'une racine de la fonction vectorielle f via la méthode de Newton avec approximation de la jacobienne :
         - x_0 donné,
         - x_kp1 = xk - Jac(f)(x_k)^-1*f(x_k).

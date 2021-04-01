@@ -144,7 +144,7 @@ def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - deux scalaires x0 et x1 (de type int, float ou np.float64), points de départ de la méthode itérative.
     
     Les arguments optionnels sont :
-        - un entier nb_iter (défaut = 100 ) défiinissant le nombre maximal d'itérations allouées à la méthode,
+        - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
         - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :

@@ -74,7 +74,7 @@ def format_iter(k, x_k, t_k):
             header += "\n"
         else:
             header = ""
-        iter_infos = "{:>4} || {:>+11.4e} | {:>+8.4f}"
+        iter_infos = "{:>4} || {:>+11.4e} | {:>+9.4f}"
         iter_infos = iter_infos.format(k, x_k, t_k)
     
     else:
@@ -84,12 +84,12 @@ def format_iter(k, x_k, t_k):
             header  = "{:>4} || " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^8}"
             header  = header.format("k", "x_k", "t_k")
             header += "\n"
-            header += "-"*(4+len_str_xk+len_str_xk+8 + 4+3)
+            header += "-"*(4+len_str_xk+9 + 4+3)
             header += "\n"
         else:
             header = ""
         iter_infos  = "{:>4} || ".format(k)
-        iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "+"{:>8.4f}".format(t_k)
+        iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "+"{:>+9.4f}".format(t_k)
     
     return(header+iter_infos)
 

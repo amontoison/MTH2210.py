@@ -89,6 +89,7 @@ def format_iter(k, x_k, f_k):
         else:
             header = ""
         iter_infos  = "{:>4} || ".format(k)
+        iter_infos += "{:>+13.4e} | ".format(np.linalg.norm(x_k-f_k))
         iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "
         iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in f_k])+"]"
     

@@ -148,7 +148,7 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
     
     Les arguments optionnels sont :
-        - un entier nb_iter (défaut = 100 ) défiinissant le nombre maximal d'itérations allouées à l'algorithme,
+        - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à l'algorithme,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
         - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
@@ -178,12 +178,12 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
     
     # Initialisation de l'algorithme
     k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = init_algo(f, x0, x1)
-    write_iter(k, x_g, x_d, x_c, f_g, f_d, f_c)
+    write_iter(k, x_g, x_d, f_g, f_d, x_c, f_c)
     
     # Déroulement de l'algorithme
     while not(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[0]):
         k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = iter_algo(f, k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f)
-        write_iter(k, x_g, x_d, x_c, f_g, f_d, f_c)
+        write_iter(k, x_g, x_d, f_g, f_d, x_c, f_c)
     
     write_stopping(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
