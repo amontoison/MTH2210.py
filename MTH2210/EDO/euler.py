@@ -67,7 +67,7 @@ def format_iter(k, x_k, t_k):
 
     if type(x_k) == np.float64:
         if k == 0:
-            header  = "{:>4} || {:^11} | {:^8}"
+            header  = "{:>4} || {:^11} | {:^9}"
             header  = header.format("k", "x_k", "t_k")
             header += "\n"
             header += "-"*(4+11+8 + 4+3)
@@ -81,7 +81,7 @@ def format_iter(k, x_k, t_k):
         if k == 0:
             n = len(x_k)
             len_str_xk = 2+11*n+2*(n-1)
-            header  = "{:>4} || " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^8}"
+            header  = "{:>4} || " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^9}"
             header  = header.format("k", "x_k", "t_k")
             header += "\n"
             header += "-"*(4+len_str_xk+9 + 4+3)
