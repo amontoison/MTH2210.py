@@ -1,6 +1,7 @@
 from MTH2210.Racines_points_fixes.bissection import bissection
 from MTH2210.Racines_points_fixes.newton_1d  import newton_1d
 from MTH2210.Racines_points_fixes.newton_nd  import newton_nd
+from MTH2210.Racines_points_fixes.newton_nd  import newton_nd_avec_der
 from MTH2210.Racines_points_fixes.point_fixe import point_fixe
 from MTH2210.Racines_points_fixes.secante    import secante
 
