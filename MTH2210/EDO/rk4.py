@@ -84,7 +84,7 @@ def format_iter(k, x_k, t_k):
             header  = "{:>4} || " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^9}"
             header  = header.format("k", "x_k", "t_k")
             header += "\n"
-            header += "-"*(4+len_str_xk+len_str_xk+8 + 4+3)
+            header += "-"*(4+len_str_xk+9 + 4+3)
             header += "\n"
         else:
             header = ""
