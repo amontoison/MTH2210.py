@@ -14,12 +14,12 @@ Created on Wed Jul 01 12:00:00 2020
 
 # Définit la fonction write_iter, qui écrira dans le stdout ou un fichier selon le contenu de output
 def define_writing_function(format_iter, output):
-    if output == "":
+    if output.lower() == "pipe":
         def write_iter(*args):
             print(format_iter(*args))
         def write_stopping(reason):
             print(reason+"\n")
-    elif output == "None":
+    elif output.lower() in ["none", ""]:
         def write_iter(*args):
             pass
         def write_stopping(reason):

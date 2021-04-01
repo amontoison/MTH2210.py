@@ -56,12 +56,12 @@ def format_output(x, y, x_e, y_e):
     output_infos  = " {:^11} || {:^11}".format("x", "y")+"\n"
     output_infos += " "+"-"*26 + "\n"
     for i in range(len(x)):
-        output_infos += " {:>+8.4e} || {:>+8.4e}".format(x[i], y[i])+"\n"
+        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x[i], y[i])+"\n"
     output_infos += " "+"-"*26 + "\n"
     output_infos += " {:^11} || {:^11}".format("x_e", "y_e")+"\n"
     output_infos += " "+"-"*26 + "\n"
     for i in range(len(x_e)):
-        output_infos += " {:>+8.4e} || {:>+8.4e}".format(x_e[i], y_e[i])+"\n"
+        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x_e[i], y_e[i])+"\n"
     return(output_infos)
 
 
@@ -100,10 +100,10 @@ def lagrange(x, y, x_e, output=""):
         - un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
     
     L'argument optionnel est :
-        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            - la sortie standard si output = "",
+        - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "None".
+            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - x et y ont même dimension,

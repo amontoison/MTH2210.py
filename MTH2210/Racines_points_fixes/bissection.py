@@ -62,14 +62,18 @@ def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
 ###########################################
 
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
-def format_iter(k, x_g, x_d, x_c, f_g, f_d, f_c):
+def format_iter(k, x_g, x_d, f_g, f_d, x_c, f_c):
     if k == 0:
-        iter_infos  = "   k ||     x_g     |     x_d     ||     f_g     |     f_d     ||     x_c     |     f_c\n"
-        iter_infos += "-------------------------------------------------------------------------------------------\n"
+       header   = "{:>4} || {:^11} | {:^11} || {:^11} | {:^11} || {:^11} | {:^11}"
+       header   = header.format("k", "x_g", "x_d", "f_g", "f_d", "x_c", "f_c")
+       header  += "\n"
+       header  += "-"*(4+11+11+11+11+11+11 + 4+3+4+3+4+3)
+       header  += "\n"
     else:
-        iter_infos = ""
-    iter_infos += "{:>4} || {:^+.4e} | {:^+.4e} || {:^+.4e} | {:^+.4e} || {:^+.4e} | {:^+.4e}".format(k, x_g, x_d, f_g, f_d, x_c, f_c)
-    return(iter_infos)
+       header  = ""
+    iter_infos = "{:>4} || {:>+11.4e} | {:>+11.4e} || {:>+11.4e} | {:>+11.4e} || {:>+11.4e} | {:>+11.4e}"
+    iter_infos = iter_infos.format(k, x_g, x_d, f_g, f_d, x_c, f_c)
+    return(header+iter_infos)
 
 
 
@@ -79,14 +83,14 @@ def format_iter(k, x_g, x_d, x_c, f_g, f_d, f_c):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel):
-    if k > nb_iter:
+    if k >= nb_iter:
         return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
     if abs(list_f[-1]) < tol_abs:
-        return(True, "Racine localisée à {:2.1e} près : x = {:+8.7e} et f(x) = {:+8.7e}".format(tol_abs, list_x[-1], list_f[-1]))
+        return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+14.7e}".format(tol_abs, list_x[-1], list_f[-1]))
     if k >= 1:
         err_rel_x = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
         if err_rel_x < tol_rel:
-            return(True, "Convergence achevée à {:2.1e} près : x = {:+8.7e} et erreur relative sur x = {:5.4e}".format(tol_rel, list_x[-1], err_rel_x))
+            return(True, "Convergence achevée à {:7.1e} près : x = {:+14.7e} et erreur relative sur x = {:10.4e}".format(tol_rel, list_x[-1], err_rel_x))
     return(False, "convergence inachevée")
 
 
@@ -140,17 +144,17 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - à chaque itération k, le point noté x_k est x_c.
     
     Les arguments attendus sont :
-        - une fonction f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
+        - une fonction f, supposée continue, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
         - deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
     
     Les arguments optionnels sont :
-        - un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,
-        - un réel tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
-        - un réel tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
-        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            - la sortie standard si output = "",
+        - un entier nb_iter (défaut = 100 ) défiinissant le nombre maximal d'itérations allouées à l'algorithme,
+        - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
+        - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
+        - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "None".
+            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - les bornes initiales doivent satisfaire f(x0)*f(x1) < 0 pour garantir l'existence d'une racine dans [x0,x1],

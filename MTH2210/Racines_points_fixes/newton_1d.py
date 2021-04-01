@@ -62,12 +62,16 @@ def check_parameters_consistency(f, df, x0, nb_iter, tol_rel, tol_abs, output):
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, list_x, list_f, list_d):
     if k == 0:
-        iter_infos  = "   k ||     x_k     |   f(x_k)    |   df(x_k)\n"
-        iter_infos += "-----------------------------------------------\n"
+        header  = "{:4} || {:^11} | {:^11} | {:^11}"
+        header  = header.format("k", "x_k", "f(x_k)", "df(x_k)")
+        header += "\n"
+        header += "-"*(4+11+11+11 + 4+3+3)
+        header += "\n"
     else:
-        iter_infos = ""
-    iter_infos += "{:>4} || {:^+5.4e} | {:^+5.4e} | {:^+5.4e}".format(k, list_x[-1], list_f[-1], list_d[-1])
-    return(iter_infos)
+        header  = ""
+    iter_infos = "{:>4} || {:>+11.4e} | {:>+11.4e} | {:>+11.4e}"
+    iter_infos = iter_infos.format(k, list_x[-1], list_f[-1], list_d[-1])
+    return(header+iter_infos)
 
 
 
@@ -77,16 +81,16 @@ def format_iter(k, list_x, list_f, list_d):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs):
-    if k > nb_iter:
+    if k >= nb_iter:
         return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
     if abs(list_f[-1]) < tol_abs:
-        return(True, "Racine localisée à {:2.1e} près : x = {:+8.7e} et f(x) = {:+8.7e}".format(tol_abs, list_x[-1], list_f[-1]))
+        return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+11.4e}".format(tol_abs, list_x[-1], list_f[-1]))
     if list_d[-1] == 0:
-        return(True, "Dérivée exactement nulle au point courant x_k = {:5.4e}".format(tol_rel, list_x[-1]))
+        return(True, "Dérivée exactement nulle au point courant x_k = {:+14.7e}".format(list_x[-1]))
     if k > 1:
         err_rel = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
         if err_rel < tol_rel:
-            return(True, "Convergence de la méthode achevée à {:2.1e} près : df/dx(x_k) = {:5.4e}".format(tol_rel, err_rel))
+            return(True, "Convergence de la méthode achevée à {:7.1e} près : df/dx(x_k) = {:+11.4e}".format(tol_rel, err_rel))
     return(False, "convergence inachevée")
 
 
@@ -135,13 +139,13 @@ def newton_1d(f, df, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output="")
         - un scalaire  x0 (de type int, float ou np.float64), point de départ de la méthode itérative.
     
     Les arguments optionnels sont :
-        - un entier nb_iter définissant le nombre maximal d'itérations allouées à la méthode,
-        - un réel   tol_rel définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
-        - un réel   tol_abs définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
-        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            - la sortie standard si output = "",
+        - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
+        - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
+        - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
+        - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "None".
+            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
          - f est définie en x0, et renvoie un scalaire,

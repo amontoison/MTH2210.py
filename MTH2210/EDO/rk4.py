@@ -64,24 +64,35 @@ def check_parameters_consistency(f, x0, t0, tm, m, output):
 
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, t_k):
+
     if type(x_k) == np.float64:
-        temp1 = 11
-        temp2 = 12
+        if k == 0:
+            header  = "{:>4} || {:^11} | {:^8}"
+            header  = header.format("k", "x_k", "t_k")
+            header += "\n"
+            header += "-"*(4+11+8 + 4+3)
+            header += "\n"
+        else:
+            header = ""
+        iter_infos = "{:>4} || {:>+11.4e} | {:>+8.4f}"
+        iter_infos = iter_infos.format(k, x_k, t_k)
+    
     else:
-        n = len(x_k)
-        temp1 = 2+11*n+2*(n-1)+1
-        temp2 = temp1
-    if k == 0:
-        iter_infos  = "   k ||    t_k   | " + ("{:^"+str(temp1)+"}").format("x_k") + "\n"
-        iter_infos += "------------------" + "-"*temp2 + "\n"
-    else:
-        iter_infos = ""
-    iter_infos += "{:>4} || {:>8.4f} | ".format(k, t_k)
-    if type(x_k) == np.float64:
-        iter_infos += "{:>+5.4e}".format(x_k)
-    else:
-        iter_infos += "["+", ".join(["{:>+5.4e}".format(xi) for xi in x_k])+"]"
-    return(iter_infos)
+        if k == 0:
+            n = len(x_k)
+            len_str_xk = 2+11*n+2*(n-1)
+            header  = "{:>4} || " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^8}"
+            header  = header.format("k", "x_k", "t_k")
+            header += "\n"
+            header += "-"*(4+len_str_xk+len_str_xk+8 + 4+3)
+            header += "\n"
+        else:
+            header = ""
+        iter_infos  = "{:>4} || ".format(k)
+        iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "+"{:>8.4f}".format(t_k)
+    
+    return(header+iter_infos)
+
 
 
 #%%########################################
@@ -145,10 +156,10 @@ def rk4(f, x0, t0, tm, m, output=""):
         - deux réels t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,
         - un entier m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
     
-    L'argument optionnel est une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-        - la sortie standard si output = "",
+    L'argument optionnel est une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+        - la sortie standard si output = "pipe",
         - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-        - nul part (aucune information écrite ni sauvegardée) si output = "None".
+        - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
     
     La méthode vérifie les conditions suivantes :
         - la fonction f est définie en (x0,t0) et en (x0,tm),

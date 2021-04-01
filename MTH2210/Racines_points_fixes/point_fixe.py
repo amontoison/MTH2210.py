@@ -45,10 +45,10 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
             raise ValueError("f(x0) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0))+")")
         if len(f(x0)) != len(x0):
             raise ValueError("Les dimensions de f(x0) (= "+str(len(f(x0)))+") et x0 (= "+str(len(x0))+") diffèrent")
-    norme_iter_0 = np.linalg.norm(f(x0)-x0)
-    norme_iter_1 = np.linalg.norm(f(f(x0))-f(x0))
-    if norme_iter_0 < norme_iter_1:
-            raise ValueError("La fonction ne semble pas contractante : norm(f(x0)-x0) = "+str(norme_iter_0)+" >= norm(f(f(x0)-f(x0))) = "+str(norme_iter_1))
+#    norme_iter_0 = np.linalg.norm(f(x0)-x0)
+#    norme_iter_1 = np.linalg.norm(f(f(x0))-f(x0))
+#    if norme_iter_0 < norme_iter_1:
+#            raise ValueError("La fonction ne semble pas contractante : norm(f(x0)-x0) = "+str(norme_iter_0)+" < norm(f(f(x0)-f(x0))) = "+str(norme_iter_1))
     if nb_iter < 0:
         raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
     if tol_rel < 0:
@@ -64,34 +64,35 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
 
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, f_k):
+    
     if type(x_k) == np.float64:
-        temp1 = 13
-        temp2 = 11
+        if k == 0:
+            header  = "{:>4} || {:^11} | {:^11} | {:^11}"
+            header  = header.format("k", "|f_k-x_k|", "x_k", "f_k")
+            header += "\n"
+            header += "-"*(4+11+11+11 + 4+3+3)
+            header += "\n"
+        else:
+            header = ""
+        iter_infos = "{:>4} || {:>+11.4e} | {:>+11.4e} | {:>+11.4e}"
+        iter_infos = iter_infos.format(k, abs(x_k-f_k), x_k, f_k)
+    
     else:
-        n = len(x_k)
-        temp1 = 13
-        temp2 = 11*n + 2*(n-1) + 2
-    if k == 0:
-        iter_infos  = "   k || "
-        iter_infos += ("{:^"+str(temp1)+"}").format("norm(f_k-x_k)")
-        iter_infos += " || "
-        iter_infos += ("{:^"+str(temp2)+"}").format("x_k")
-        iter_infos += " | "
-        iter_infos += ("{:^"+str(temp2)+"}").format("f_k")
-        iter_infos += "\n"
-        iter_infos += "--------" + "-"*temp1 + "----" + "-"*temp2 + "---" + "-"*temp2
-        iter_infos += "\n"
-    else:
-        iter_infos = ""
-    iter_infos += "{:>4} || {:8.7e}".format(k, np.linalg.norm(x_k-f_k))
-    if type(x_k) == np.float64:
-        iter_infos += " || {:>6.5e} | {:>6.5e}".format(x_k, f_k)
-    else:
-        iter_infos += " || "
-        iter_infos += "["+", ".join(["{:>+5.4e}".format(xi) for xi in x_k])+"]"
-        iter_infos += " | "
-        iter_infos += "["+", ".join(["{:>+5.4e}".format(fi) for fi in f_k])+"]"
-    return(iter_infos)
+        if k == 0:
+            n = len(x_k)
+            len_str_xk = 2+11*n+2*(n-1)
+            header  = "{:>4} || {:^13} | " + "{:^"+str(len_str_xk)+"}" + " | " + "{:^"+str(len_str_xk)+"}"
+            header  = header.format("k", "norm(f_k-x_k)", "x_k", "f_k")
+            header += "\n"
+            header += "-"*(4+13+len_str_xk+len_str_xk + 4+3+3)
+            header += "\n"
+        else:
+            header = ""
+        iter_infos  = "{:>4} || ".format(k)
+        iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "
+        iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in f_k])+"]"
+    
+    return(header+iter_infos)
 
 
 
@@ -105,11 +106,11 @@ def stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs):
         return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
     norm = np.linalg.norm(f(list_x[-1])-list_x[-1])
     if norm < tol_abs:
-        return(True, "Point fixe localisé à {:2.1e} près : norme(f(x_k)-x_k) = {:5.4e}".format(tol_abs, norm))
+        return(True, "Point fixe localisé à {:7.1e} près : norme(f(x_k)-x_k) = {:10.4e}".format(tol_abs, norm))
     if k > 1:
         err_rel = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
         if err_rel < tol_rel:
-            return(True, "Convergence de la méthode achevée à {:5.4e} près : erreur relative sur x = {:5.4e}".format(tol_rel, err_rel))
+            return(True, "Convergence de la méthode achevée à {:7.1e} près : erreur relative sur x = {:10.4e}".format(tol_rel, err_rel))
     return(False, "convergence inachevée")
 
 
@@ -150,17 +151,17 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - un vecteur x0, point de départ de la méthode itérative.
     
     Les arguments optionnels sont :
-        - un entier nb_iter défiinissant le nombre maximal d'itérations allouées à la méthode,
-        - un réel tol_rel définissant la condition d'arrêt e_k = norm(x_k-x_km1) / (norm(x_k)+eps) <= tol_rel,
-        - un réel tol_abs définissant la condition d'arrêt norm(f(x_k)-x_k) <= tol_abs,
-        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            - la sortie standard si output = "",
+        - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
+        - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
+        - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
+        - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "None".
+            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
     
     La méthode vérifie les conditions suivantes :
         - la fonction f est définie en x0,
-        - norm(f(x0)-x0) >= norm(f(f(x0)-f(x0)))
+        - norm(f(x0)-x0) >= norm(f(f(x0)-f(x0))) (/!\ vérification de cette condition enlevée en avril 2021 /!\)
         - f(x0) renvoie un vecteur de la même dimension que x0.
     
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple, en définissant :

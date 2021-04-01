@@ -69,12 +69,12 @@ def format_output(x, y, x_e, y_e):
     output_infos  = " {:^11} || {:^11}".format("x", "y")+"\n"
     output_infos += " "+"-"*26 + "\n"
     for i in range(len(x)):
-        output_infos += " {:>+8.4e} || {:>+8.4e}".format(x[i], y[i])+"\n"
+        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x[i], y[i])+"\n"
     output_infos += " "+"-"*26 + "\n"
     output_infos += " {:^11} || {:^11}".format("x_e", "y_e")+"\n"
     output_infos += " "+"-"*26 + "\n"
     for i in range(len(x_e)):
-        output_infos += " {:>+8.4e} || {:>+8.4e}".format(x_e[i], y_e[i])+"\n"
+        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x_e[i], y_e[i])+"\n"
     return(output_infos)
 
 
@@ -180,10 +180,10 @@ def spline_cub(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
         - un réel val_g, utilisé dans la détermination de la condition à gauche (ignorée si cond_g = 0 ou 2) (défaut = 0),
         - un entier cond_d dans [0,1,2,3], déterminant la condition à droite (analogue à cond_g),
         - un réel val_d, utilisé dans la détermination de la condition à droite (analogue à val_g),
-        - une chaîne de caractères output qui renvoie les affichages de la fonction vers :
-            - la sortie standard si output = "",
+        - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
+            - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "None".
+            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - x et y ont même dimension,
