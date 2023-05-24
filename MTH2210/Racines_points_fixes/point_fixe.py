@@ -27,7 +27,7 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,       "f",       types.FunctionType],
                     [x0,      "x0",      [np.ndarray, np.float64]],
-                    [nb_iter, "nb_iter", np.int],
+                    [nb_iter, "nb_iter", int],
                     [tol_rel, "tol_rel", np.float64],
                     [tol_abs, "tol_abs", np.float64],
                     [output,  "output",  str]]
@@ -64,7 +64,7 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
 
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, f_k):
-    
+
     if type(x_k) == np.float64:
         if k == 0:
             header  = "{:>4} || {:^11} | {:^11} | {:^11}"
@@ -76,7 +76,7 @@ def format_iter(k, x_k, f_k):
             header = ""
         iter_infos = "{:>4} || {:>+11.4e} | {:>+11.4e} | {:>+11.4e}"
         iter_infos = iter_infos.format(k, abs(x_k-f_k), x_k, f_k)
-    
+
     else:
         if k == 0:
             n = len(x_k)
@@ -92,7 +92,7 @@ def format_iter(k, x_k, f_k):
         iter_infos += "{:>+13.4e} | ".format(np.linalg.norm(x_k-f_k))
         iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "
         iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in f_k])+"]"
-    
+
     return(header+iter_infos)
 
 
@@ -146,11 +146,11 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de calcul d'un point fixe x=f(x) par méthode itérative :
         - x_0 donné,
         - x_kp1 = f(x_k).
-    
+
     Les arguments attendus sont :
         - une fonction f, admettant en entrée un vecteur x, renvoyant un vecteur f(x) de même dimension que x,
         - un vecteur x0, point de départ de la méthode itérative.
-    
+
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
@@ -159,12 +159,12 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
             - la sortie standard si output = "pipe",
             - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
             - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
-    
+
     La méthode vérifie les conditions suivantes :
         - la fonction f est définie en x0,
         - norm(f(x0)-x0) >= norm(f(f(x0)-f(x0))) (/!\ vérification de cette condition enlevée en avril 2021 /!\)
         - f(x0) renvoie un vecteur de la même dimension que x0.
-    
+
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple, en définissant :
         - x = np.array(1) est un np.ndarray, x = np.array([1]) également,
         - f(x) = np.cos(x)           est un np.float64,
@@ -180,34 +180,32 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - cas sans garantie de fonctionnement correct :
             - x    complexe,
             - x    de dimension 1 défini par un np.array([valeur]).
-    
+
     Les sorties de la méthode sont :
         - list_x,  la liste des points x_k,
         - err_rel, la liste des approximations de l'erreur relative à chaque itération (prenant pour référence le dernier élément de list_x).
-        
+
     Exemples d'appel :
         - point_fixe(lambda x : x**2, 0.5),
         - point_fixe(lambda x : x**2, np.array([0.1,0.1])).
     """
-    
+
     # Test des paramètres et définition de la destination de sortie des itérations
     if check_type_arguments.check_real(x0)[0]:
         x0 = np.float64(x0)
     check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
-    
+
     # Initialisation de l'algorithme
     k, x, fx, list_x = init_algo(f, x0)
     write_iter(k, x, fx)
-    
+
     # Déroulement de l'algorithme
     while not(stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs)[0]):
         k, x, fx, list_x = iter_algo(f, k, x, list_x)
         write_iter(k, x, fx)
     err_rel = np.array( [abs(xi-list_x[-1]) for xi in list_x] )
-    
+
     write_stopping(stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
     return(list_x, err_rel)
-
-

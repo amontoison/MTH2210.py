@@ -53,9 +53,9 @@ def check_function(arg):
 def check_str(arg):
     return(check_fundamental(arg, str))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int, float, np.int ou np.float64); et (type est le type de arg)
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int, float, int ou np.float64); et (type est le type de arg)
 def check_real(arg):
-    if check_fundamental(arg, np.int)[0] == True:
+    if check_fundamental(arg, int)[0] == True:
         return(True, get_type(arg))
     elif check_fundamental(arg, np.float64)[0] == True:
         return(True, get_type(arg))
@@ -66,7 +66,7 @@ def check_real(arg):
     else:
         return(False, get_type(arg))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int ou np.int); et (type est le type de arg)
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int ou int); et (type est le type de arg)
 def check_int(arg):
     return(check_fundamental(arg, int))
 
@@ -86,7 +86,7 @@ def check_generic(arg, expected_type):
         return(check_str(arg))
     if expected_type == np.float64:
         return(check_real(arg))
-    if expected_type == np.int:
+    if expected_type == int:
         return(check_int(arg))
     if expected_type == np.ndarray:
         return(check_nparray(arg))
@@ -133,5 +133,3 @@ def check_parameters(args_list):
     if buffer_errors != []:
         buffer_errors = "\n".join(["Problèmes de type des paramètres :"]+buffer_errors)
         raise ValueError(buffer_errors)
-
-

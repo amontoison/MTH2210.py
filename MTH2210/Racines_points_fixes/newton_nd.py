@@ -27,7 +27,7 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,       "f",       types.FunctionType],
                     [x0,      "x0",      np.ndarray],
-                    [nb_iter, "nb_iter", np.int],
+                    [nb_iter, "nb_iter", int],
                     [tol_rel, "tol_rel", np.float64],
                     [tol_abs, "tol_abs", np.float64],
                     [output,  "output",  str]]
@@ -103,14 +103,14 @@ def app_jac(f,x):
     n = np.size(x)
     h_init = 10**-6 if np.min(x) == 0 else 10**-3*np.min(x)
     app_list = [np.zeros((n,n)), np.zeros((n,n))]
-    
+
     for i in range(len(app_list)):
         h = h_init / 2**i
         for d in range(n):
             delta_h = np.zeros(n)
             delta_h[d] = h
             app_list[i][:,d] = (f(x+delta_h) - f(x-delta_h)) / (2*h)
-    
+
     app = (2**2*app_list[1] - app_list[0]) / (2**2-1)
     return(app)
 
@@ -153,11 +153,11 @@ def newton_nd(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """Méthode de recherche d'une racine de la fonction vectorielle f via la méthode de Newton avec approximation de la jacobienne :
         - x_0 donné,
         - x_kp1 = xk - Jac(f)(x_k)^-1*f(x_k).
-    
+
     Les arguments attendus sont :
         - une fonction  f, admettant en entrée un vecteur x et renvoyant un vecteur f(x),
         - un scalaire  x0 (de type int, float ou np.float64), point de départ de la méthode itérative.
-    
+
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
@@ -170,12 +170,12 @@ def newton_nd(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     La méthode vérifie les conditions suivantes :
          - f est définie en x0, et renvoie un vecteur de même dimension que x0,
          - tous les paramètres reçus ont bien le type attendu.
-    
+
     Les sorties de la méthode sont :
         - list_x, la liste des points x_k,
         - list_f, les valeurs par     f  des éléments de list_x,
         - list_d, les valeurs par Jac(f) des éléments de list_x.
-        
+
     Exemples d'appel :
         - newton_nd(lambda x:x**2, np.array([1,1,1])),
         - def f(x):
@@ -183,22 +183,20 @@ def newton_nd(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
           x0 = np.array([1,1,1])
           newton_nd(f, x0).
     """
-    
+
     # Test des paramètres et définition de la destination de sortie des itérations
     check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
-    
+
     # Initialisation de l'algorithme
     k, list_x, list_f, list_d = init_algo(f, x0)
     write_iter(k, list_x, list_f)
-    
+
     # Déroulement de l'algorithme
     while not(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[0]):
         k, list_x, list_f, list_d = iter_algo(f, k, list_x, list_f, list_d)
         write_iter(k, list_x, list_f)
-    
+
     write_stopping(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
     return(list_x, list_f, list_d)
-
-
