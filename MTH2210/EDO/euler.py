@@ -29,7 +29,7 @@ def check_parameters_consistency(f, x0, t0, tm, m, output):
                     [x0,     "x0",     [np.ndarray, np.float64]],
                     [t0,     "t0",     np.float64],
                     [tm,     "tm",     np.float64],
-                    [m,      "m",      np.int],
+                    [m,      "m",      int],
                     [output, "output", str]]
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
@@ -76,7 +76,7 @@ def format_iter(k, x_k, t_k):
             header = ""
         iter_infos = "{:>4} || {:>+11.4e} | {:>+9.4f}"
         iter_infos = iter_infos.format(k, x_k, t_k)
-    
+
     else:
         if k == 0:
             n = len(x_k)
@@ -90,7 +90,7 @@ def format_iter(k, x_k, t_k):
             header = ""
         iter_infos  = "{:>4} || ".format(k)
         iter_infos += "["+", ".join(["{:>+11.4e}".format(xi) for xi in x_k])+"] | "+"{:>+9.4f}".format(t_k)
-    
+
     return(header+iter_infos)
 
 
@@ -141,13 +141,13 @@ def euler(f, x0, t0, tm, m, output=""):
         - x_0 donné, t_0 donné, pas de temps h donné,
         - x_kp1 = x_k + h*f(x_k,t_k),
         - t_kp1 = t_k + h.
-    
+
     Les arguments attendus sont :
         - une fonction f, admettant en entrée un vecteur x et un réel t, renvoyant un vecteur f(x,t),
         - un vecteur  x0, condition initiale de l'équation,
         - deux réels  t0 et tm, les bornes de l'intervalle de temps sur lequel l'équation est appliquée,
         - un entier    m, le pas de discrétisation de [t0,tm], définissant donc h = (tm-t0)/m.
-    
+
     L'argument optionnel est une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
         - la sortie standard si output = "pipe",
         - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
@@ -157,7 +157,7 @@ def euler(f, x0, t0, tm, m, output=""):
         - la fonction f est définie en (x0,t0) et en (x0,tm),
         - f(x0,t0) renvoie un vecteur de la même dimension et même type que x0,
         - tous les paramètres reçus ont bien le type attendu.
-    
+
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple :
         - x = np.array(0) est un np.ndarray, x = np.array([0]) également,
         - f(x,t) = np.cos(np.array(0))   est un np.float64,
@@ -173,11 +173,11 @@ def euler(f, x0, t0, tm, m, output=""):
         - cas sans garantie de fonctionnement correct :
             - x      complexe,
             - x      de dimension 1 défini par un np.array([valeur]).
-    
+
     Les sorties de la méthode sont :
         - list_x, la liste des points x(t_k),
         - list_t, la liste des instants t_k.
-        
+
     Exemples d'appel :
         - euler(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),
         - euler(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),
@@ -187,24 +187,22 @@ def euler(f, x0, t0, tm, m, output=""):
           x = np.array([2,1])
           list_x, list_t = euler(f, x, 0, 10, 100).
     """
-    
+
     # Test des paramètres et définition de la destination de sortie des itérations
     if check_type_arguments.check_real(x0)[0]:
         x0 = np.float64(x0)
     check_parameters_consistency(f, x0, t0, tm, m, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
-    
+
     # Initialisation de l'algorithme
     k, x, t, h, list_x, list_t = init_algo(x0, t0, tm, m)
     write_iter(k, x, t)
-    
+
     # Déroulement de l'algorithme
     while not(stopping_criteria(k, m)[0]):
         k, x, t, list_x, list_t = iter_algo(f, k, x, t, h, list_x, list_t)
         write_iter(k, x, t)
-    
+
     write_stopping(stopping_criteria(k, m)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
     return(list_x, list_t)
-
-

@@ -28,7 +28,7 @@ def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
     params_array = [[f,       "f",       types.FunctionType],
                     [x0,      "x0",      np.float64],
                     [x1,      "x1",      np.float64],
-                    [nb_iter, "nb_iter", np.int],
+                    [nb_iter, "nb_iter", int],
                     [tol_rel, "tol_rel", np.float64],
                     [tol_abs, "tol_abs", np.float64],
                     [output,  "output",  str]]
@@ -142,11 +142,11 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - si f(x_g)*f(x_c) < 0, alors la méthode est relancée avec x_g inchangé et x_d = x_c,
         - si f(x_c)*f(x_d) < 0, alors la méthode est relancée avec x_g = x_c et x_d inchangé,
         - à chaque itération k, le point noté x_k est x_c.
-    
+
     Les arguments attendus sont :
         - une fonction f, supposée continue, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
         - deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
-    
+
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à l'algorithme,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
@@ -161,32 +161,30 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - f est définie en x0 et x1, et renvoie en chacun de ces points un scalaire,
         - nb_iter, tol_rel et tol_abs sont positifs,
         - tous les paramètres reçus ont bien le type attendu.
-    
+
     Les sorties de la méthode sont :
         - list_x, la liste des points centraux de l'intervalle de recherche à chaque itération (donc les approximations x_k de la racine),
         - list_f, les valeurs par f des éléments de list_x.
-        
+
     Exemples d'appel :
         - bissection(lambda x : np.sin(x), -0.5, 1/3),
         - bissection(lambda x : 10**20*np.sin(x), -0.5, 0.25),
         - bissection(f, x0, x1, output="dossier_test/Résultats.txt") où f est définie via def, x0 et x1 sont deux réels.
     """
-    
+
     # Test des paramètres et définition de la destination de sortie des itérations
     check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
-    
+
     # Initialisation de l'algorithme
     k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = init_algo(f, x0, x1)
     write_iter(k, x_g, x_d, f_g, f_d, x_c, f_c)
-    
+
     # Déroulement de l'algorithme
     while not(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[0]):
         k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f = iter_algo(f, k, x_g, x_d, x_c, f_g, f_d, f_c, list_x, list_f)
         write_iter(k, x_g, x_d, f_g, f_d, x_c, f_c)
-    
+
     write_stopping(stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
     return(list_x, list_f)
-
-

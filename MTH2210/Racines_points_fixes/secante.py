@@ -28,7 +28,7 @@ def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
     params_array = [[f,       "f",       types.FunctionType],
                     [x0,      "x0",      np.float64],
                     [x1,      "x1",      np.float64],
-                    [nb_iter, "nb_iter", np.int],
+                    [nb_iter, "nb_iter", int],
                     [tol_rel, "tol_rel", np.float64],
                     [tol_abs, "tol_abs", np.float64],
                     [output,  "output",  str]]
@@ -138,11 +138,11 @@ def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - x_0 et x_1 donnés,
         - d_k = (f(x_k)-f(x_km1)) / (x_k-x_km1),
         - x_kp1 = x_k - f(x_k) / d_k.
-    
+
     Les arguments attendus sont :
         - une fonction f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
         - deux scalaires x0 et x1 (de type int, float ou np.float64), points de départ de la méthode itérative.
-    
+
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
         - un réel   tol_rel (défaut = 1e-8) définissant la condition d'arrêt abs(x_k-x_km1) / (abs(x_k)+eps) <= tol_rel,
@@ -156,32 +156,30 @@ def secante(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - f est définie en x0 et x1, et renvoie un scalaire,
         - df est définie en x0 et x1, et renvoie un scalaire,
         - tous les paramètres reçus ont bien le type attendu.
-    
+
     Les sorties de la méthode sont :
         - list_x, la liste des points x_k,
         - list_f, les valeurs par f des éléments de list_x,
         - list_d, la liste des approximations d_k des dérivées de f en les x_k.
-        
+
     Exemples d'appel :
         - secante(lambda x : np.sin(x), 1, 0.5),
         - secante(lambda x :x**2, 2, 1).
     """
-    
+
     # Test des paramètres et définition de la destination de sortie des itérations
     check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
-    
+
     # Initialisation de l'algorithme
     k, list_x, list_f, list_d = init_algo(f, x0, x1)
     write_iter(k, list_x, list_f, list_d)
-    
+
     # Déroulement de l'algorithme
     while not(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[0]):
         k, list_x, list_f, list_d = iter_algo(f, k, list_x, list_f, list_d)
         write_iter(k, list_x, list_f, list_d)
-    
+
     write_stopping(stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs)[1])
     # Renvoi de la liste des approximations de la racine, des valeurs de f associées, et des erreurs relatives
     return(list_x, list_f, list_d)
-
-
