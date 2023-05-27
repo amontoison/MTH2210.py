@@ -22,11 +22,11 @@ import numpy as np
 #########################################
 
 # Renvoie le type de l'argument arg, sous forme d'une chaîne de caractères de la forme "<class 'type_de_arg'>"
+#   get_type(123)               = "<class 'int'>"
 #   get_type("123")             = "<class 'str'>"
 #   get_type(lambda x:x)        = "<class 'function'>"
 #   get_type(np.array([1,2,3])) = "<class 'numpy.ndarray'>"
-def get_type(arg):
-    return(str(type(arg)))
+def get_type(arg): return(str(type(arg)))
 
 # Vérifie la concordance entre le type de arg et le type attendu. Renvoie le booléen et le vrai type de arg.
 #   check_fundamental("123", str)                     = True,  "<class 'str'>"
@@ -36,8 +36,7 @@ def get_type(arg):
 #   check_fundamental(lambda x:x, types.FunctionType) = True,  "<class 'function'>"
 #   check_fundamental(get_type, types.FunctionType)   = True,  "<class 'function'>"
 #   check_fundamental(np.array([1,2,3]), np.ndarray)  = True,  "<class 'numpy.ndarray'>"
-def check_fundamental(arg, expected_type):
-    return(isinstance(arg, expected_type), get_type(arg))
+def check_fundamental(arg, expected_type): return(isinstance(arg, expected_type), get_type(arg))
 
 
 
@@ -45,53 +44,35 @@ def check_fundamental(arg, expected_type):
 # Définition des fonctions pour chaque type #
 #############################################
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une fonction); et (type est le type de arg)
-def check_function(arg):
-    return(check_fundamental(arg, types.FunctionType))
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une fonction) et (type est le type de arg)
+def check_function(arg): return(check_fundamental(arg, types.FunctionType))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une chaîne de caractères); et (type est le type de arg)
-def check_str(arg):
-    return(check_fundamental(arg, str))
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une chaîne de caractères) et (type est le type de arg)
+def check_str(arg): return(check_fundamental(arg, str))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int, float, int ou np.float64); et (type est le type de arg)
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int ou float) et (type est le type de arg)
 def check_real(arg):
-    if check_fundamental(arg, int)[0] == True:
-        return(True, get_type(arg))
-    elif check_fundamental(arg, np.float64)[0] == True:
-        return(True, get_type(arg))
-    elif check_fundamental(arg, float)[0] == True:
-        return(True, get_type(arg))
-    elif check_fundamental(arg, int)[0] == True:
-        return(True, get_type(arg))
-    else:
-        return(False, get_type(arg))
+    if   check_fundamental(arg, int  )[0] == True: return(True,  get_type(arg))
+    elif check_fundamental(arg, float)[0] == True: return(True,  get_type(arg))
+    else:                                          return(False, get_type(arg))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int ou int); et (type est le type de arg)
-def check_int(arg):
-    return(check_fundamental(arg, int))
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un int) et (type est le type de arg)
+def check_int(arg): return(check_fundamental(arg, int))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un np.ndarray); et (type est le type de arg)
-def check_nparray(arg):
-    return(check_fundamental(arg, np.ndarray))
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est un np.ndarray) et (type est le type de arg)
+def check_nparray(arg): return(check_fundamental(arg, np.ndarray))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une liste); et (type est le type de arg)
-def check_list(arg):
-    return(check_fundamental(arg, list))
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est une liste) et (type est le type de arg)
+def check_list(arg): return(check_fundamental(arg, list))
 
-# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est du type expected_type); et (type est le type de arg)
+# Renvoie un couple (bool, type) où (bool = True si et seulement si arg est du type expected_type) et (type est le type de arg)
 def check_generic(arg, expected_type):
-    if expected_type == types.FunctionType:
-        return(check_function(arg))
-    if expected_type == str:
-        return(check_str(arg))
-    if expected_type == np.float64:
-        return(check_real(arg))
-    if expected_type == int:
-        return(check_int(arg))
-    if expected_type == np.ndarray:
-        return(check_nparray(arg))
-    if expected_type == list:
-        return(check_list(arg))
+    if expected_type == types.FunctionType: return(check_function(arg))
+    if expected_type == str:                return(check_str(arg))
+    if expected_type == float:              return(check_real(arg))
+    if expected_type == int:                return(check_int(arg))
+    if expected_type == np.ndarray:         return(check_nparray(arg))
+    if expected_type == list:               return(check_list(arg))
 
 
 

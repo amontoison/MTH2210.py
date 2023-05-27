@@ -28,35 +28,27 @@ def check_parameters_consistency(x, y, x_e, cond_g, val_g, cond_d, val_d, output
                     [y,       "y",       [list, np.ndarray]],
                     [x_e,     "x_e",     [list, np.ndarray]],
                     [cond_g,  "cond_g",   int],
-                    [val_g,   "val_g",    np.float64],
+                    [val_g,   "val_g",    float],
                     [cond_d,  "cond_d",   int],
-                    [val_d,   "val_d",    np.float64],
+                    [val_d,   "val_d",    float],
                     [output,  "output",   str]]
     if check_type_arguments.check_list(x)[0] == True:
-        for i in range(len(x)):
-            params_array.append([x[i], "xi", np.float64])
+        for i in range(len(x)): params_array.append([x[i], "xi", float])
     if check_type_arguments.check_list(y)[0] == True:
-        for i in range(len(y)):
-            params_array.append([y[i], "yi", np.float64])
+        for i in range(len(y)): params_array.append([y[i], "yi", float])
     if check_type_arguments.check_list(x_e)[0] == True:
-        for i in range(len(x_e)):
-            params_array.append([x_e[i], "x_evali", np.float64])
+        for i in range(len(x_e)): params_array.append([x_e[i], "x_evali", float])
     params_array.append([output, "output", str])
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    if len(x) != len(y):
-        raise ValueError("Les dimensions de x (= "+str(len(x))+") et de y (= "+str(len(y))+") ne concordent pas")
-    if len(x) != len(list(set(x))):
-        raise ValueError("Le vecteur x des abscisses contient des doublons")
+    if len(x) != len(y):            raise ValueError("Les dimensions de x (= "+str(len(x))+") et de y (= "+str(len(y))+") ne concordent pas")
+    if len(x) != len(list(set(x))): raise ValueError("Le vecteur x contient des doublons")
     x_sort = [xi for xi in x]
     x_sort.sort()
     for i in range(len(x)):
-        if x[i] != x_sort[i]:
-            raise ValueError("Le vecteur x des abscisses n'est pas dans l'ordre croissant")
-    if cond_g not in [0,1,2,3]:
-        raise ValueError("La condition limite à gauche n'a pas une valeur recevable (= "+str(cond_g)+"), attendue dans [0,1,2,3]")
-    if cond_d not in [0,1,2,3]:
-        raise ValueError("La condition limite à droite n'a pas une valeur recevable (= "+str(cond_d)+"), attendue dans [0,1,2,3]")
+        if x[i] != x_sort[i]:       raise ValueError("Les éléments du vecteur x ne sont pas dans l'ordre croissant")
+    if cond_g not in [0,1,2,3]:     raise ValueError("La condition limite à gauche n'a pas une valeur recevable (= "+str(cond_g)+"), attendue dans [0,1,2,3]")
+    if cond_d not in [0,1,2,3]:     raise ValueError("La condition limite à droite n'a pas une valeur recevable (= "+str(cond_d)+"), attendue dans [0,1,2,3]")
 
 
 
@@ -86,10 +78,8 @@ def format_output(x, y, x_e, y_e):
 # Phase de calcul de la spline
 def init_algo(x, y, c_g, v_g, c_d, v_d):
     
-    def hx(i):
-        return(x[i]-x[i-1])
-    def hy(i):
-        return(y[i]-y[i-1])
+    def hx(i): return(x[i]-x[i-1])
+    def hy(i): return(y[i]-y[i-1])
     
     np1 = len(x)
     n = np1-1
@@ -136,23 +126,19 @@ def init_algo(x, y, c_g, v_g, c_d, v_d):
     
     def interpolation_1_output(xe):
         i = 1
-        while i < len(x) and xe > x[i]:
-            i += 1
-        if i == len(x):
-            i -= 1
+        while i < len(x) and xe > x[i]: i += 1
+        if i == len(x): i -= 1
         coeff_1 = -1 * d2f[i-1] / (6*hx(i))
         coeff_2 = +1 * d2f[i  ] / (6*hx(i))
         coeff_3 = d2f[i-1]*hx(i)/6 - y[i-1]/hx(i)
         coeff_4 = y[i]/hx(i) - d2f[i]*hx(i)/6
-        return(np.float64(coeff_1*(xe-x[i])**3 + coeff_2*(xe-x[i-1])**3  + coeff_3*(xe-x[i]) + coeff_4*(xe-x[i-1])))
+        return(float(coeff_1*(xe-x[i])**3 + coeff_2*(xe-x[i-1])**3  + coeff_3*(xe-x[i]) + coeff_4*(xe-x[i-1])))
     
     def interpolation(x_e):
-        if check_type_arguments.check_real(x_e)[0] == True:
-            return(interpolation_1_output(np.array([x_e])))
+        if check_type_arguments.check_real(x_e)[0] == True: return(interpolation_1_output(np.array([x_e])))
         else:
             result = []
-            for xe in x_e:
-                result.append(interpolation_1_output(xe))
+            for xe in x_e: result.append(interpolation_1_output(xe))
             return(np.array(result))
     
     return(interpolation)
@@ -167,8 +153,8 @@ def spline_cub(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
     """Calcul d'une spline cubique d'interpolation de tous les points (x_k,y_k) donnés en paramètres x et y.
     
     Les arguments attendus sont :
-        - un vecteur x, contenant les abscisses des points d'interpolation,\n
-        - un vecteur y, contenant les ordonnées des points d'interpolation,\n
+        - un vecteur x, contenant les abscisses des points d'interpolation,
+        - un vecteur y, contenant les ordonnées des points d'interpolation,
         - un vecteur x_e, contenant les abscisses des points auxquels le polynôme d'interpolation sera évalué.
     
     Les arguments optionnels sont :
@@ -182,8 +168,8 @@ def spline_cub(x, y, x_e, cond_g=0, val_g=0, cond_d=0, val_d=0, output=""):
         - un réel val_d, utilisé dans la détermination de la condition à droite (analogue à val_g),
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
             - la sortie standard si output = "pipe",
-            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+            - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - x et y ont même dimension,

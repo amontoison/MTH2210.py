@@ -26,34 +26,24 @@ import numpy as np
 def check_parameters_consistency(f, x0, x1, nb_iter, tol_rel, tol_abs, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,       "f",       types.FunctionType],
-                    [x0,      "x0",      np.float64],
-                    [x1,      "x1",      np.float64],
+                    [x0,      "x0",      float],
+                    [x1,      "x1",      float],
                     [nb_iter, "nb_iter", int],
-                    [tol_rel, "tol_rel", np.float64],
-                    [tol_abs, "tol_abs", np.float64],
+                    [tol_rel, "tol_rel", float],
+                    [tol_abs, "tol_abs", float],
                     [output,  "output",  str]]
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    try:
-        f(x0)
-    except:
-        raise ValueError("Fonction f non définie en x0")
-    try:
-        f(x1)
-    except:
-        raise ValueError("Fonction f non définie en x1")
-    if not(check_type_arguments.check_generic(f(x0), np.float64)[0]):
-        raise ValueError("f(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x0))+")")
-    if not(check_type_arguments.check_generic(f(x1), np.float64)[0]):
-        raise ValueError("f(x1) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x1))+")")
-    if not(f(x0)*f(x1) < 0):
-        raise ValueError("Condition initiale f(x0)*f(x1) < 0 non respectée")
-    if nb_iter < 0:
-        raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
-    if tol_rel < 0:
-        raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
-    if tol_abs < 0:
-        raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
+    try:    f(x0)
+    except: raise ValueError("Fonction f non définie en x0")
+    try:    f(x1)
+    except: raise ValueError("Fonction f non définie en x1")
+    if not(check_type_arguments.check_generic(f(x0), float)[0]): raise ValueError("f(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x0))+")")
+    if not(check_type_arguments.check_generic(f(x1), float)[0]): raise ValueError("f(x1) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x1))+")")
+    if not(f(x0)*f(x1) < 0): raise ValueError("Condition initiale f(x0)*f(x1) < 0 non respectée")
+    if nb_iter < 0:          raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
+    if tol_rel < 0:          raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
+    if tol_abs < 0:          raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
 
 
 
@@ -83,14 +73,11 @@ def format_iter(k, x_g, x_d, f_g, f_d, x_c, f_c):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(k, list_x, list_f, nb_iter, tol_abs, tol_rel):
-    if k >= nb_iter:
-        return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
-    if abs(list_f[-1]) < tol_abs:
-        return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+14.7e}".format(tol_abs, list_x[-1], list_f[-1]))
+    if k >= nb_iter:              return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
+    if abs(list_f[-1]) < tol_abs: return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+14.7e}".format(tol_abs, list_x[-1], list_f[-1]))
     if k >= 1:
         err_rel_x = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
-        if err_rel_x < tol_rel:
-            return(True, "Convergence achevée à {:7.1e} près : x = {:+14.7e} et erreur relative sur x = {:10.4e}".format(tol_rel, list_x[-1], err_rel_x))
+        if err_rel_x < tol_rel:   return(True, "Convergence achevée à {:7.1e} près : x = {:+14.7e} et erreur relative sur x = {:10.4e}".format(tol_rel, list_x[-1], err_rel_x))
     return(False, "convergence inachevée")
 
 
@@ -141,11 +128,11 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - si f(x_c) = 0, on a trouvé la racine,
         - si f(x_g)*f(x_c) < 0, alors la méthode est relancée avec x_g inchangé et x_d = x_c,
         - si f(x_c)*f(x_d) < 0, alors la méthode est relancée avec x_g = x_c et x_d inchangé,
-        - à chaque itération k, le point noté x_k est x_c.
+        - à chaque itération k, le point x_k renvoyé en fin d'itération est x_c.
 
     Les arguments attendus sont :
         - une fonction f, supposée continue, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
-        - deux scalaires x0 et x1 (de type int, float ou np.float64), les bornes de l'intervalle de recherche contenant la racine à localiser.
+        - deux scalaires x0 et x1 (de type int ou float), les bornes de l'intervalle de recherche contenant la racine à localiser.
 
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à l'algorithme,
@@ -153,8 +140,8 @@ def bissection(f, x0, x1, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""
         - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
             - la sortie standard si output = "pipe",
-            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+            - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - les bornes initiales doivent satisfaire f(x0)*f(x1) < 0 pour garantir l'existence d'une racine dans [x0,x1],

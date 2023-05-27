@@ -26,35 +26,26 @@ import numpy as np
 def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,       "f",       types.FunctionType],
-                    [x0,      "x0",      [np.ndarray, np.float64]],
+                    [x0,      "x0",      [np.ndarray, float]],
                     [nb_iter, "nb_iter", int],
-                    [tol_rel, "tol_rel", np.float64],
-                    [tol_abs, "tol_abs", np.float64],
+                    [tol_rel, "tol_rel", float],
+                    [tol_abs, "tol_abs", float],
                     [output,  "output",  str]]
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    try:
-        f(x0)
-    except:
-        raise ValueError("Fonction f non définie en x0")
-    if type(x0) == np.float64:
-        if not(check_type_arguments.check_generic(f(x0), np.float64)[0]):
-            raise ValueError("f(x0) n'est pas un vecteur np.float64 (type reçu :"+check_type_arguments.get_type(f(x0))+")")
+    try:    f(x0)
+    except: raise ValueError("Fonction f non définie en x0")
+    if type(x0) == float and not(check_type_arguments.check_generic(f(x0), float)[0]): raise ValueError("f(x0) n'est pas un float (type reçu :"+check_type_arguments.get_type(f(x0))+")")
     else:
-        if not(check_type_arguments.check_generic(f(x0), np.ndarray)[0]):
-            raise ValueError("f(x0) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0))+")")
-        if len(f(x0)) != len(x0):
-            raise ValueError("Les dimensions de f(x0) (= "+str(len(f(x0)))+") et x0 (= "+str(len(x0))+") diffèrent")
+        if not(check_type_arguments.check_generic(f(x0), np.ndarray)[0]): raise ValueError("f(x0) n'est pas un np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0))+")")
+        if len(f(x0)) != len(x0): raise ValueError("Les dimensions de f(x0) (= "+str(len(f(x0)))+") et x0 (= "+str(len(x0))+") diffèrent")
 #    norme_iter_0 = np.linalg.norm(f(x0)-x0)
 #    norme_iter_1 = np.linalg.norm(f(f(x0))-f(x0))
 #    if norme_iter_0 < norme_iter_1:
 #            raise ValueError("La fonction ne semble pas contractante : norm(f(x0)-x0) = "+str(norme_iter_0)+" < norm(f(f(x0)-f(x0))) = "+str(norme_iter_1))
-    if nb_iter < 0:
-        raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
-    if tol_rel < 0:
-        raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
-    if tol_abs < 0:
-        raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
+    if nb_iter < 0: raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
+    if tol_rel < 0: raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
+    if tol_abs < 0: raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
 
 
 
@@ -65,7 +56,7 @@ def check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output):
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, f_k):
 
-    if type(x_k) == np.float64:
+    if type(x_k) == float:
         if k == 0:
             header  = "{:>4} || {:^11} | {:^11} | {:^11}"
             header  = header.format("k", "|f_k-x_k|", "x_k", "f_k")
@@ -103,15 +94,12 @@ def format_iter(k, x_k, f_k):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(f, k, list_x, nb_iter, tol_rel, tol_abs):
-    if k > nb_iter:
-        return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
     norm = np.linalg.norm(f(list_x[-1])-list_x[-1])
-    if norm < tol_abs:
-        return(True, "Point fixe localisé à {:7.1e} près : norme(f(x_k)-x_k) = {:10.4e}".format(tol_abs, norm))
+    if k > nb_iter:           return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
+    if norm < tol_abs:        return(True, "Point fixe localisé à {:7.1e} près : norme(f(x_k)-x_k) = {:10.4e}".format(tol_abs, norm))
     if k > 1:
         err_rel = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
-        if err_rel < tol_rel:
-            return(True, "Convergence de la méthode achevée à {:7.1e} près : erreur relative sur x = {:10.4e}".format(tol_rel, err_rel))
+        if err_rel < tol_rel: return(True, "Convergence de la méthode achevée à {:7.1e} près : erreur relative sur x = {:10.4e}".format(tol_rel, err_rel))
     return(False, "convergence inachevée")
 
 
@@ -157,26 +145,24 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
         - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
             - la sortie standard si output = "pipe",
-            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+            - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - la fonction f est définie en x0,
-        - norm(f(x0)-x0) >= norm(f(f(x0)-f(x0))) (/!\ vérification de cette condition enlevée en avril 2021 /!\)
         - f(x0) renvoie un vecteur de la même dimension que x0.
 
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple, en définissant :
-        - x = np.array(1) est un np.ndarray, x = np.array([1]) également,
-        - f(x) = np.cos(x)           est un np.float64,
-        - f(x) = np.array(np.cos(x)) est un np.ndarray,
-        - f(x) = np.cos(t)           est un np.float64.
+        - x = np.array(1) est un np.ndarray, y = np.array([1]) est également un np.ndarray,
+        - f(x) = np.cos(x) est un float,
+        - f(y) = np.cos(y) est un np.ndarray.
     Ces différences de types peuvent faire échouer la méthode si x est de dimension 1. La méthode est conçue pour fonctionner suivant :
         - si la dimension de x est > 1 :
             - x    défini par un np.array([coordonnées]),
             - f(x) renvoyant  un np.ndarray de même dimension que x,
         - si x est de dimension 1 :
-            - x    défini par un np.float64(valeur), un float ou un int,
-            - f(x) renvoyant  un np.float64,
+            - x    défini par un float ou un int,
+            - f(x) renvoyant  un float,
         - cas sans garantie de fonctionnement correct :
             - x    complexe,
             - x    de dimension 1 défini par un np.array([valeur]).
@@ -191,8 +177,7 @@ def point_fixe(f, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output=""):
     """
 
     # Test des paramètres et définition de la destination de sortie des itérations
-    if check_type_arguments.check_real(x0)[0]:
-        x0 = np.float64(x0)
+    if check_type_arguments.check_real(x0)[0]: x0 = float(x0)
     check_parameters_consistency(f, x0, nb_iter, tol_rel, tol_abs, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
 

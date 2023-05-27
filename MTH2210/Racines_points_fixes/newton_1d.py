@@ -27,31 +27,22 @@ def check_parameters_consistency(f, df, x0, nb_iter, tol_rel, tol_abs, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,       "f",       types.FunctionType],
                     [df,      "df",      types.FunctionType],
-                    [x0,      "x0",      np.float64],
+                    [x0,      "x0",      float],
                     [nb_iter, "nb_iter", int],
-                    [tol_rel, "tol_rel", np.float64],
-                    [tol_abs, "tol_abs", np.float64],
+                    [tol_rel, "tol_rel", float],
+                    [tol_abs, "tol_abs", float],
                     [output,  "output",  str]]
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    try:
-        f(x0)
-    except:
-        raise ValueError("Fonction f non définie en x0")
-    try:
-        df(x0)
-    except:
-        raise ValueError("Fonction df non définie en x0")
-    if not(check_type_arguments.check_generic(f(x0), np.float64)[0]):
-        raise ValueError("f(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x0))+")")
-    if not(check_type_arguments.check_generic(df(x0), np.float64)[0]):
-        raise ValueError("df(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(df(x0))+")")
-    if nb_iter < 0:
-        raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
-    if tol_rel < 0:
-        raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
-    if tol_abs < 0:
-        raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
+    try:    f(x0)
+    except: raise ValueError("Fonction f non définie en x0")
+    try:    df(x0)
+    except: raise ValueError("Fonction df non définie en x0")
+    if not(check_type_arguments.check_generic(f(x0),  float)[0]):  raise ValueError("f(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(f(x0))+")")
+    if not(check_type_arguments.check_generic(df(x0), float)[0]): raise ValueError("df(x0) n'est pas un scalaire (type reçu :"+check_type_arguments.get_type(df(x0))+")")
+    if nb_iter < 0: raise ValueError("Condition d'arrêt nb_iter définie à une valeur négative")
+    if tol_rel < 0: raise ValueError("Condition d'arrêt tol_rel définie à une valeur négative")
+    if tol_abs < 0: raise ValueError("Condition d'arrêt tol_abs définie à une valeur négative")
 
 
 
@@ -81,16 +72,12 @@ def format_iter(k, list_x, list_f, list_d):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(k, list_x, list_f, list_d, nb_iter, tol_rel, tol_abs):
-    if k >= nb_iter:
-        return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
-    if abs(list_f[-1]) < tol_abs:
-        return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+11.4e}".format(tol_abs, list_x[-1], list_f[-1]))
-    if list_d[-1] == 0:
-        return(True, "Dérivée exactement nulle au point courant x_k = {:+14.7e}".format(list_x[-1]))
+    if k >= nb_iter:              return(True, "Nombre maximal d'itérations k_max={} autorisé dépassé".format(nb_iter))
+    if abs(list_f[-1]) < tol_abs: return(True, "Racine localisée à {:7.1e} près : x = {:+14.7e} et f(x) = {:+11.4e}".format(tol_abs, list_x[-1], list_f[-1]))
+    if list_d[-1] == 0:           return(True, "Dérivée exactement nulle au point courant x_k = {:+14.7e}".format(list_x[-1]))
     if k > 1:
         err_rel = check_relative_tolerance.tol_rel_approx(list_x[-1], list_x[-2])
-        if err_rel < tol_rel:
-            return(True, "Convergence de la méthode achevée à {:7.1e} près : df/dx(x_k) = {:+11.4e}".format(tol_rel, err_rel))
+        if err_rel < tol_rel:     return(True, "Convergence de la méthode achevée à {:7.1e} près : df/dx(x_k) = {:+11.4e}".format(tol_rel, err_rel))
     return(False, "convergence inachevée")
 
 
@@ -136,7 +123,7 @@ def newton_1d(f, df, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output="")
     Les arguments attendus sont :
         - une fonction  f, admettant en entrée un scalaire x et renvoyant un scalaire f(x),
         - une fonction df, admettant en entrée un scalaire x et renvoyant un scalaire f'(x),
-        - un scalaire  x0 (de type int, float ou np.float64), point de départ de la méthode itérative.
+        - un scalaire  x0 (de type int ou float), point de départ de la méthode itérative.
 
     Les arguments optionnels sont :
         - un entier nb_iter (défaut = 100 ) définissant le nombre maximal d'itérations allouées à la méthode,
@@ -144,8 +131,8 @@ def newton_1d(f, df, x0, nb_iter=100, tol_rel=10**-8, tol_abs=10**-8, output="")
         - un réel   tol_abs (défaut = 1e-8) définissant la condition d'arrêt abs(f(x_k)) <= tol_abs,
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
             - la sortie standard si output = "pipe",
-            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+            - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
          - f est définie en x0, et renvoie un scalaire,

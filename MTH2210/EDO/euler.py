@@ -26,35 +26,25 @@ import numpy as np
 def check_parameters_consistency(f, x0, t0, tm, m, output):
     # Vérification des types des paramètres reçus
     params_array = [[f,      "f",      types.FunctionType],
-                    [x0,     "x0",     [np.ndarray, np.float64]],
-                    [t0,     "t0",     np.float64],
-                    [tm,     "tm",     np.float64],
+                    [x0,     "x0",     [np.ndarray, float]],
+                    [t0,     "t0",     float],
+                    [tm,     "tm",     float],
                     [m,      "m",      int],
                     [output, "output", str]]
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    try:
-        f(x0, t0)
-    except:
-        raise ValueError("Fonction f non définie en (x0,t0)")
-    try:
-        f(x0, tm)
-    except:
-        raise ValueError("Fonction f non définie en (x0,tm)")
-    if type(x0) == np.float64:
-        if not(check_type_arguments.check_generic(f(x0,t0), np.float64)[0]):
-            raise ValueError("f(x0,t0) n'est pas un vecteur np.float64 (type reçu :"+check_type_arguments.get_type(f(x0,t0))+")")
-        if not(check_type_arguments.check_generic(f(x0,tm), np.float64)[0]):
-            raise ValueError("f(x0,tm) n'est pas un vecteur np.float64 (type reçu :"+check_type_arguments.get_type(f(x0,tm))+")")
+    try:    f(x0, t0)
+    except: raise ValueError("Fonction f non définie en (x0,t0)")
+    try:    f(x0, tm)
+    except: raise ValueError("Fonction f non définie en (x0,tm)")
+    if type(x0) == float:
+        if not(check_type_arguments.check_generic(f(x0,t0), float)[0]): raise ValueError("f(x0,t0) n'est pas un float (type reçu :"+check_type_arguments.get_type(f(x0,t0))+")")
+        if not(check_type_arguments.check_generic(f(x0,tm), float)[0]): raise ValueError("f(x0,tm) n'est pas un float (type reçu :"+check_type_arguments.get_type(f(x0,tm))+")")
     else:
-        if not(check_type_arguments.check_generic(f(x0,t0), np.ndarray)[0]):
-            raise ValueError("f(x0,t0) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0,t0))+")")
-        if not(check_type_arguments.check_generic(f(x0,tm), np.ndarray)[0]):
-            raise ValueError("f(x0,tm) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0,tm))+")")
-        if len(f(x0,t0)) != len(x0):
-            raise ValueError("les dimensions de f(x0,t0) (= "+str(len(f(x0,t0)))+") et x0 (= "+str(len(x0))+") diffèrent")
-    if m < 0:
-        raise ValueError("Nombre d'itérations m défini à une valeur négative")
+        if not(check_type_arguments.check_generic(f(x0,t0), np.ndarray)[0]): raise ValueError("f(x0,t0) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0,t0))+")")
+        if not(check_type_arguments.check_generic(f(x0,tm), np.ndarray)[0]): raise ValueError("f(x0,tm) n'est pas un vecteur np.ndarray (type reçu :"+check_type_arguments.get_type(f(x0,tm))+")")
+        if len(f(x0,t0)) != len(x0): raise ValueError("les dimensions de f(x0,t0) (= "+str(len(f(x0,t0)))+") et x0 (= "+str(len(x0))+") diffèrent")
+    if m < 0: raise ValueError("Nombre d'itérations m défini à une valeur négative")
 
 
 
@@ -65,7 +55,7 @@ def check_parameters_consistency(f, x0, t0, tm, m, output):
 # Crée la chaîne de caractères qui sera renvoyée pour chaque itération
 def format_iter(k, x_k, t_k):
 
-    if type(x_k) == np.float64:
+    if type(x_k) == float:
         if k == 0:
             header  = "{:>4} || {:^11} | {:^9}"
             header  = header.format("k", "x_k", "t_k")
@@ -101,8 +91,7 @@ def format_iter(k, x_k, t_k):
 
 # Définit l'ensemble des critères d'arrêt possible, et les teste à chaque itération
 def stopping_criteria(k, m):
-    if k >= m:
-        return(True, "Nombre maximal d'itérations k_max = {} atteint".format(m))
+    if k >= m: return(True, "Nombre maximal d'itérations k_max = {} atteint".format(m))
     return(False, "convergence inachevée")
 
 
@@ -150,8 +139,8 @@ def euler(f, x0, t0, tm, m, output=""):
 
     L'argument optionnel est une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
         - la sortie standard si output = "pipe",
-        - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-        - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+        - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+        - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - la fonction f est définie en (x0,t0) et en (x0,tm),
@@ -159,17 +148,17 @@ def euler(f, x0, t0, tm, m, output=""):
         - tous les paramètres reçus ont bien le type attendu.
 
     À noter que si x est un vecteur de dim 1, f doit être implémentée avec parcimonie pour ne pas renvoyer un mauvais type. Par exemple :
-        - x = np.array(0) est un np.ndarray, x = np.array([0]) également,
-        - f(x,t) = np.cos(np.array(0))   est un np.float64,
-        - f(x,t) = np.cos(np.array([0])) est un np.ndarray,
-        - f(x,t) = np.cos(t)             est un np.float64.
+        - x = np.array(0) est un np.ndarray, y = np.array([0]) également,
+        - f(x,t) = np.cos(x) est un float,
+        - f(y,t) = np.cos(y) est un np.ndarray,
+        - f(x,t) = np.cos(t) est un float.
     Ces différences de types peuvent faire échouer la méthode si x est de dimension 1. La méthode est conçue pour fonctionner suivant :
         - si la dimension de x est > 1 :
             - x      défini par un np.array([coordonnées]),
             - f(x,t) renvoyant  un np.ndarray de même dimension que x,
         - si x est de dimension 1 :
-            - x      défini par un np.float64(valeur), un float ou un int,
-            - f(x,t) renvoyant  un np.float64,
+            - x      défini par un float ou un int,
+            - f(x,t) renvoyant  un float,
         - cas sans garantie de fonctionnement correct :
             - x      complexe,
             - x      de dimension 1 défini par un np.array([valeur]).
@@ -179,7 +168,7 @@ def euler(f, x0, t0, tm, m, output=""):
         - list_t, la liste des instants t_k.
 
     Exemples d'appel :
-        - euler(lambda x,t : np.cos(t), np.float64(0), 0, 2*np.pi, 100),
+        - euler(lambda x,t : np.cos(t), 0, 0, 2*np.pi, 100),
         - euler(lambda x,t : np.array([np.cos(t),np.sin(t)]), np.array([0,0]), 0, 2*np.pi, 100),
         - def f(x,t):
               x0,x1 = 1,1
@@ -189,8 +178,7 @@ def euler(f, x0, t0, tm, m, output=""):
     """
 
     # Test des paramètres et définition de la destination de sortie des itérations
-    if check_type_arguments.check_real(x0)[0]:
-        x0 = np.float64(x0)
+    if check_type_arguments.check_real(x0)[0]: x0 = float(x0)
     check_parameters_consistency(f, x0, t0, tm, m, output)
     write_iter, write_stopping = writing_function.define_writing_function(format_iter, output)
 

@@ -29,21 +29,16 @@ def check_parameters_consistency(x, y, x_e, output):
                     [x_e,     "x_e",     [list, np.ndarray]],
                     [output,  "output",   str]]
     if check_type_arguments.check_list(x)[0] == True:
-        for i in range(len(x)):
-            params_array.append([x[i], "xi", np.float64])
+        for i in range(len(x)): params_array.append([x[i], "xi", float])
     if check_type_arguments.check_list(y)[0] == True:
-        for i in range(len(y)):
-            params_array.append([y[i], "yi", np.float64])
+        for i in range(len(y)): params_array.append([y[i], "yi", float])
     if check_type_arguments.check_list(x_e)[0] == True:
-        for i in range(len(x_e)):
-            params_array.append([x_e[i], "x_evali", np.float64])
+        for i in range(len(x_e)): params_array.append([x_e[i], "x_evali", float])
     params_array.append([output, "output", str])
     check_type_arguments.check_parameters(params_array)
     # Vérification de la cohérence des paramètres
-    if len(x) != len(y):
-        raise ValueError("Les dimensions de x (= "+str(len(x))+") et de y (= "+str(len(y))+") ne concordent pas")
-    if len(x) != len(list(set(x))):
-        raise ValueError("Le vecteur x des abscisses contient des doublons")
+    if len(x) != len(y):            raise ValueError("Les dimensions de x (= "+str(len(x))+") et de y (= "+str(len(y))+") ne concordent pas")
+    if len(x) != len(list(set(x))): raise ValueError("Le vecteur x contient des doublons")
 
 
 
@@ -55,13 +50,11 @@ def check_parameters_consistency(x, y, x_e, output):
 def format_output(x, y, x_e, y_e):
     output_infos  = " {:^11} || {:^11}".format("x", "y")+"\n"
     output_infos += " "+"-"*26 + "\n"
-    for i in range(len(x)):
-        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x[i], y[i])+"\n"
+    for i in range(len(x)): output_infos += " {:>+11.4e} || {:>+11.4e}".format(x[i], y[i])+"\n"
     output_infos += " "+"-"*26 + "\n"
     output_infos += " {:^11} || {:^11}".format("x_e", "y_e")+"\n"
     output_infos += " "+"-"*26 + "\n"
-    for i in range(len(x_e)):
-        output_infos += " {:>+11.4e} || {:>+11.4e}".format(x_e[i], y_e[i])+"\n"
+    for i in range(len(x_e)): output_infos += " {:>+11.4e} || {:>+11.4e}".format(x_e[i], y_e[i])+"\n"
     return(output_infos)
 
 
@@ -72,15 +65,12 @@ def format_output(x, y, x_e, y_e):
 
 # Phase d'initialisation de toutes les suites exploitées par la méthode
 def init_algo(x, y):
-    def interpolation_1_output(x, y, xe):
-        return(np.sum([ y[j]*np.prod([(x[i]-xe)/(x[i]-x[j]) for i in range(len(x)) if i != j]) for j in range(len(y)) ]) )
+    def interpolation_1_output(x, y, xe): return(np.sum([ y[j]*np.prod([(x[i]-xe)/(x[i]-x[j]) for i in range(len(x)) if i != j]) for j in range(len(y)) ]) )
     def interpolation(x_e):
-        if check_type_arguments.check_real(x_e)[0] == True:
-            return(interpolation_1_output(x, y, np.array([x_e])))
+        if check_type_arguments.check_real(x_e)[0] == True: return(interpolation_1_output(x, y, np.array([x_e])))
         else:
             result = []
-            for xe in x_e:
-                result.append(interpolation_1_output(x, y, xe))
+            for xe in x_e: result.append(interpolation_1_output(x, y, xe))
             return(np.array(result))
     return(interpolation)
 
@@ -102,8 +92,8 @@ def lagrange(x, y, x_e, output=""):
     L'argument optionnel est :
         - une chaîne de caractères output (défaut = "") qui renvoie les affichages de la fonction vers :
             - la sortie standard si output = "pipe",
-            - un fichier ayant pour nom+extension output (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
-            - nul part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
+            - un fichier ayant output comme nom+extension (le paramètre doit donc contenir l'extension voulue, et le chemin d'accès doit exister),
+            - nulle part (aucune information écrite ni sauvegardée) si output = "" ou output = "None".
 
     La méthode vérifie les conditions suivantes :
         - x et y ont même dimension,
