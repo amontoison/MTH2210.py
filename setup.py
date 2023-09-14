@@ -6,5 +6,5 @@ setup(name='MTH2210',
     author='Pierre-Yves Bouchet',
     url='https://github.com/amontoison/MTH2210.py',
     packages=find_packages(),#['MTH2210'],
-    install_requires=['numpy']
+    install_requires=['numpy','matplotlib']
  )
